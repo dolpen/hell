@@ -61,11 +61,8 @@ public class MemberUtil {
             if (dummy == null)
                 return false;
             dummy.skill = forDummy;
-            System.out.println(dummy.name+"の役職は"+forDummy.getLabel());
             dummy.save();
         }
-        for(Member m : members)System.out.println(m.name);
-        for(Skill s : skills)System.out.println(s.getLabel());
         // 役職の割り振り
         l = members.size();
         int[] ind = shuffle(l);

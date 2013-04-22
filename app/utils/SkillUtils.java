@@ -16,7 +16,6 @@ public class SkillUtils {
     public static List<Skill> getSkillsFromFormStr(String form) {
         if (Strings.isNullOrEmpty(form))
             return Lists.newArrayList();
-        System.out.println(form);
         List<Skill> skills = Lists.newArrayList();
         for (char signal : form.replaceAll("[\\n\\r]+", "").toCharArray()) {
             Skill s = Skill.bySign(new String(new char[] { signal }));

@@ -16,7 +16,7 @@ public class Constants {
     public static final String VOTE_EXECUTION = "投票の結果、 %s が処刑されました。";
     public static final String VOTE_RESULT = " %s は %s だったようです。";
     public static final String FORTUNE_RESULT = " %s は %s のようです。";
-    public static final String GUARD_RESULT = " %s は %s を護衛しています。";
+    public static final String GUARD_RESULT = " %s を護衛しています。";
     public static final String BITE_EXECUTION = " %s を襲撃します。";
     public static final String BITE_FAILED = "今日は犠牲者がいないようだ。人狼は襲撃を失敗したのだろうか。";
     public static final String BITE_RESULT = " %s が無残な姿で発見されました。";
@@ -50,7 +50,7 @@ public class Constants {
             + "村村村村村村村村村村村村狼狼狼占霊狂狩共共\n"
             + "村村村村村村村村村村村村村狼狼狼占霊狂狩共共";
     public static final String FORM_CATTLE = "村村狼占\n"
-            + "村占占狼占\n"
+            + "村狩狩狼占\n"
             + "村狩狩狩狼占\n"
             + "村村村村村狼占";
 

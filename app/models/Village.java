@@ -312,7 +312,7 @@ public class Village extends GenericModel {
             for (Member m : work.get(Skill.Hunter)) {
                 Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
                 guardIds.add(target.memberId);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.GUARD_RESULT, target.name, target.skill.getAppearance()));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.GUARD_RESULT, target.name));
             }
         }
         // 襲撃/無残メッセージと襲撃
