@@ -131,7 +131,6 @@ public class Village extends GenericModel {
         if (!canEnter()) return null;
         Member m = enter(null, Character.dummy());
         if (m == null) return null;
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.ENTER_VILLAGE, m.name));
         dummyMemberId = m.memberId;
         return m.memberId;
     }
@@ -144,7 +143,6 @@ public class Village extends GenericModel {
         Member m = Member.leave(this, null);
         if (m == null) return;
         dummyMemberId = null;
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.LEAVE_VILLAGE, m.name));
     }
 
     /**
