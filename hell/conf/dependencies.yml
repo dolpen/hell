@@ -1,6 +1,0 @@
-# Application dependencies
-
-require:
-    - play
-    - com.google.guava  -> guava 12.0
-    - joda-time 2.1
