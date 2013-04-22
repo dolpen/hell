@@ -1,0 +1,19 @@
+#{extends 'main.html' /} #{set title:'Home' /} #{set 'navi'}
+<a href="@{Options.settle}">開村</a>
+#{/set}
+
+
+<table>
+    <tr>
+        <th>村ID</th>
+        <th>村名</th>
+        <th>状態</th>
+    </tr>
+    #{list items:villages, as:'village'}
+    <tr>
+        <td>${village.villageId}</td>
+        <td><a href="@{Games.index(village.villageId)}">${village.name}</a></td>
+        <td>${village.state}</td>
+    </tr>
+    #{/list}
+</table>
