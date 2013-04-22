@@ -77,6 +77,7 @@ public enum Skill {
         switch (this) {
             case Werewolf:
             case Augur:
+            case Hunter:
                 return true;
         }
         return false;
