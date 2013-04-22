@@ -16,6 +16,7 @@ public class SkillUtils {
     public static List<Skill> getSkillsFromFormStr(String form) {
         if (Strings.isNullOrEmpty(form))
             return Lists.newArrayList();
+        System.out.println(form);
         List<Skill> skills = Lists.newArrayList();
         for (char signal : form.replaceAll("[\\n\\r]+", "").toCharArray()) {
             Skill s = Skill.bySign(new String(new char[] { signal }));
@@ -36,6 +37,7 @@ public class SkillUtils {
             System.err.println("inv form");
             throw new IllegalArgumentException("不正な入力");
         }
+
         String[] forms = formSet.split("\n");
         Map<Integer, List<Skill>> skillsMap = Maps.newHashMap();
         for (String form : forms) {

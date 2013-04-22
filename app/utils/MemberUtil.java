@@ -47,6 +47,7 @@ public class MemberUtil {
             return false;
         int l = members.size();
         // ダミーの探知と役職の設定
+
         if (dummyMemberId != null) {
             Skill forDummy = skills.remove(0);
             Member dummy = null;
@@ -60,8 +61,11 @@ public class MemberUtil {
             if (dummy == null)
                 return false;
             dummy.skill = forDummy;
+            System.out.println(dummy.name+"の役職は"+forDummy.getLabel());
             dummy.save();
         }
+        for(Member m : members)System.out.println(m.name);
+        for(Skill s : skills)System.out.println(s.getLabel());
         // 役職の割り振り
         l = members.size();
         int[] ind = shuffle(l);

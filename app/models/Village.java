@@ -297,7 +297,6 @@ public class Village extends GenericModel {
         Map<Long, Member> names = MemberUtil.memberMap(members); // id -> object
         // 狼：襲撃先の選定
         Long victimId = CommitUtil.processAttack(work.get(Skill.Werewolf), names.keySet(), dummyMemberId, dayCount);
-        Member victim = names.get(victimId);
         // 夜明け
         dayCount++;
         state = State.Day;
@@ -307,10 +306,24 @@ public class Village extends GenericModel {
             Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
             Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.FORTUNE_RESULT, target.name, target.skill.getAppearance()));
         }
+        // 護衛
+        Set<Long> guardIds = Sets.newHashSet();
+        if (dayCount > 2) { // 働くのは3日目夜明けより
+            for (Member m : work.get(Skill.Hunter)) {
+                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
+                guardIds.add(target.memberId);
+                Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.GUARD_RESULT, target.name, target.skill.getAppearance()));
+            }
+        }
         // 襲撃/無残メッセージと襲撃
+        Member victim = names.get(victimId);
         Res.createNewSystemMessage(this, Permission.Group, Skill.Werewolf, String.format(Constants.BITE_EXECUTION, victim.name));
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.BITE_RESULT, victim.name));
-        victim.attack();
+        if (guardIds.contains(victimId)) { // GJ
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.BITE_FAILED);
+        } else { // 護衛失敗
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.BITE_RESULT, victim.name));
+            victim.attack();
+        }
         // 選択された対象のリセット
         CommitUtil.resetTargets(members);
         endCheck(members);
@@ -399,6 +412,7 @@ public class Village extends GenericModel {
 
     /**
      * 村の管理権限が対象ユーザーにあるかを確認
+     *
      * @param user ユーザー
      * @return 管理権限の有無
      */
