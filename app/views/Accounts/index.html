@@ -1,0 +1,21 @@
+#{extends 'main.html' /} #{set title:'登録' /}
+<form class="form-horizontal" action="@{Accounts.regist}" method="post">
+    <fieldset>
+        <legend>登録</legend>
+        <div class="control-group">
+            <label class="control-label" for="name_text">名前</label>
+            <div class="controls">
+                <input type="text" name="name" class="input-xlarge" id="name_text" value="">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="pass_text">パスワード</label>
+            <div class="controls">
+                <input type="password" name="pass" class="input-xlarge" id="pass_text" value="">
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">登録する</button>
+        </div>
+    </fieldset>
+</form>

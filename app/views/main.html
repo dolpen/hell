@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>#{get 'title' /} - hell α</title>
+<meta charset="${_response_encoding}">
+<link rel="stylesheet" media="screen" href="@{'/public/stylesheets/main.css'}">
+<link rel="stylesheet" href="/public/stylesheets/bootstrap.min.css">
+#{get 'moreStyles' /}
+<link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
+<script src="@{'/public/javascripts/jquery-1.9.1.min.js'}" type="text/javascript" charset="${_response_encoding}"></script>
+<script src="@{'/public/javascripts/bootstrap.min.js'}"></script>
+<script src="@{'/public/javascripts/main.js'}"></script>
+#{get 'moreScripts' /}
+</head>
+<body>
+    <div class="navbar navbar-inverse">
+        <div class="navbar-inner">
+            <div class="container">
+                <ul class="nav pull-right">
+                    <li><a href="/"><i class="icon-home icon-white"></i>Home</a></li>
+                    <li></li> #{if session.user_id == null}
+                    <li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Login<b class="caret"></b></a>
+                        <div class="dropdown-menu dropdown-form">
+                            <form accept-charset="UTF-8" action="@{Accounts.login}" method="post">
+                                <fieldset class='textbox'>
+                                    <label><span>名前</span><input type="text" name="name" autocomplete="on" /></label> <label><span>パスワード</span><input type="password" name="pass" /></label>
+                                </fieldset>
+                                <fieldset class="subchck">
+                                    <button type="submit" class="btn submit pull-right">ログイン</button>
+                                </fieldset>
+                                <p class="footer-links">
+                                    <a href="@{Accounts.index}">新規登録</a>
+                                </p>
+                            </form>
+                        </div></li> #{/if} #{else}
+                    <li><a href="@{Accounts.logout}">ログアウト</a></li> #{/else}
+
+
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="span4">#{get 'navi' /}</div>
+            <div class="span8">#{doLayout /}</div>
+        </div>
+        <div class="row">
+            <div class="span8">
+                <p>Copyright(c) 2013 hell.dolpen.net,All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
