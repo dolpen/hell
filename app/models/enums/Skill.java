@@ -2,7 +2,6 @@ package models.enums;
 
 /**
  * 役職情報です
- *
  */
 public enum Skill {
 
@@ -41,38 +40,19 @@ public enum Skill {
         return label;
     }
 
-    public String getAppearance() {
-        return this==Werewolf?"人狼":"人間";
-    }
 
     public String getSign() {
         return sign;
     }
 
-    public Group getGroup() {
-        switch (this) {
-        case Fanatic:
-            return Group.Fanatic;
-        case Werewolf:
-        case Crazy:
-            return Group.Wolf;
-        case Mystic:
-            return Group.Mystic;
-        }
-        return Group.Dummy;
-    }
 
-    // 秘匿会話ルームを所持しているか(閲覧グループはGroupで管理)
-    public boolean hasCloset() {
-        switch (this) {
-            case Werewolf:
-            case Crazy:
-                return true;
-        }
-        return false;
-    }
+    // getter
 
-    // 夜能力を所持しているか(閲覧グループはGroupで管理)
+    /**
+     * 夜能力を所持しているか(閲覧グループはGroupで管理)
+     *
+     * @return 夜能力の有無
+     */
     public boolean hasAbility() {
         switch (this) {
             case Werewolf:
@@ -83,15 +63,27 @@ public enum Skill {
         return false;
     }
 
+
+    /**
+     * 数値から役職を得る
+     *
+     * @return 役職
+     */
     public static Skill by(int value) {
         for (Skill s : values())
             if (s.value == value)
                 return s;
         return null;
     }
-    
+
+
+    /**
+     * 文字から役職を得る
+     *
+     * @return 役職
+     */
     public static Skill bySign(String sign) {
-        if(sign == null)return null;
+        if (sign == null) return null;
         for (Skill s : values())
             if (s.sign.equals(sign))
                 return s;
@@ -99,8 +91,9 @@ public enum Skill {
     }
 
     /**
-     * 攻撃が成功可能か
-     * @return
+     * 攻撃が成功するか
+     *
+     * @return 成功するなら<code>true</code>
      */
     public boolean isAttackable() {
         switch (this) {
@@ -111,4 +104,62 @@ public enum Skill {
         return true;
     }
 
+    /**
+     * @return 占い師からの見え方
+     */
+    public String getAppearance() {
+        return this == Werewolf ? "人狼" : "人間";
+    }
+
+
+    /**
+     * @return 初期陣営
+     */
+    public Team getInitialTeam() {
+        switch (this) {
+            case Werewolf:
+            case Insane:
+            case Crazy:
+            case Fanatic:
+                return Team.Wolf;
+            case Cupid:
+            case Wooer:
+                return Team.Lovers;
+            case Hamster:
+                return Team.Hamster;
+            default:
+                return Team.Village;
+        }
+        //return Team.Others;
+    }
+
+    /**
+     * @return 会話閲覧グループ
+     */
+    public Group getGroup() {
+        switch (this) {
+            case Fanatic:
+                return Group.Fanatic;
+            case Werewolf:
+            case Crazy:
+                return Group.Wolf;
+            case Mystic:
+                return Group.Mystic;
+        }
+        return Group.Dummy;
+    }
+
+    /**
+     * 秘匿会話ルームを所持しているか(閲覧グループはGroupで管理)
+     *
+     * @return 秘匿会話能力の有無
+     */
+    public boolean hasCloset() {
+        switch (this) {
+            case Werewolf:
+            case Crazy:
+                return true;
+        }
+        return false;
+    }
 }

@@ -35,7 +35,7 @@ public class MemberUtil {
     }
 
     /**
-     * 参加者に役職を割り振る
+     * 参加者に役職、初期チームを割り振る
      *
      * @param skills        役職リスト
      * @param members       参加者リスト
@@ -61,6 +61,7 @@ public class MemberUtil {
             if (dummy == null)
                 return false;
             dummy.skill = forDummy;
+            dummy.team = forDummy.getInitialTeam();
             dummy.save();
         }
         // 役職の割り振り
@@ -69,6 +70,7 @@ public class MemberUtil {
         for (int i = 0; i < l; i++) {
             Member m = members.get(i);
             m.skill = skills.get(ind[i]);
+            m.team = m.skill.getInitialTeam();
             m.save();
         }
         return true;

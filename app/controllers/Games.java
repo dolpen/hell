@@ -62,7 +62,7 @@ public class Games extends Controller {
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
         List<Character> characters = CharacterUtil.getCharacters(village, me);
         List<Member> members = Member.findAliveExcludeMe(village, me);
-        render(village, logs, exist, alive, members, characters, admin, closet, ability, finished);
+        render(village, logs, exist, alive, me, members, characters, admin, closet, ability, finished);
     }
 
 

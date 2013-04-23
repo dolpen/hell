@@ -37,6 +37,13 @@
 </form>
 #{/if}
 
+#{if me != null}
+    <p>あなた:${me.name}#{if village.state != models.enums.State.Prologue}(${me.skill.label},${me.team.label})#{/if}</p>
+    #{if village.state == models.enums.State.Epilogue}
+        <p>#{if village.winner == me.team}勝利しました#{/if}#{else}敗北しました#{/else}</p>
+    #{/if}
+#{/if}
+
 <input type="hidden" id="timeLimit" value="${village.commitTime}"/>
 
 #{if exist && alive}
