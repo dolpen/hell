@@ -1,6 +1,8 @@
 package models;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import consts.Constants;
 import models.enums.Permission;
@@ -184,7 +186,7 @@ public class Village extends GenericModel {
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
         for (Member m : members) {
-            Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.SET_SKILL, m.name, m.skill.getLabel()));
+            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SET_SKILL, m.name, m.skill.getLabel()));
         }
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);
         return save() != null;
@@ -262,16 +264,22 @@ public class Village extends GenericModel {
         if (state != State.Day) return false;
         // 投票の集計
         Map<Long, Member> names = MemberUtil.memberMap(members); // id -> object
-        Map<Long, Integer> votes = CommitUtil.vote(Sets.newHashSet(members), names.keySet(), false); // id -> 票数
-        for (Long memberId : votes.keySet()) {
-            // * さんに * 人投票しました
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VOTE_COUNTS, names.get(memberId).name, votes.get(memberId)));
+        Set<Long> memberIds = names.keySet();
+
+        // 処刑
+        List<String> voteMessages = Lists.newArrayList();
+        for (Member m : members) {
+            Long id = m.isCommitable()?m.targetMemberId:CommitUtil.randomMemberId(memberIds, m.memberId);
+            voteMessages.add(String.format(Constants.VOTE_MESSAGE, m.name, names.get(id).name)+(m.isCommitable()?"":Constants.RANDOM));
+            m.targetMemberId =id;
         }
+        Map<Long, Integer> votes = CommitUtil.vote(Sets.newHashSet(members), memberIds, false); // id -> 票数
+        //for (Long memberId : votes.keySet()) Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VOTE_COUNTS, names.get(memberId).name, votes.get(memberId)));
         // 処刑対象の決定
-        Long inmateId = CommitUtil.getElected(names.keySet(), votes);
+        Long inmateId = CommitUtil.getElected(memberIds, votes);
         Member inmate = names.get(inmateId);
         // 処刑メッセージと処刑
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VOTE_EXECUTION, inmate.name));
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages)+"\n\n"+String.format(Constants.VOTE_EXECUTION, inmate.name));
         inmate.execute();
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.VOTE_RESULT, inmate.name, inmate.skill.getAppearance()));
@@ -304,7 +312,7 @@ public class Village extends GenericModel {
         // 占い結果
         for (Member m : work.get(Skill.Augur)) {
             Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
-            Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.FORTUNE_RESULT, target.name, target.skill.getAppearance()));
+            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_RESULT, target.name, target.skill.getAppearance())+(m.isCommitable()?"":Constants.RANDOM));
         }
         // 護衛
         Set<Long> guardIds = Sets.newHashSet();
@@ -312,7 +320,7 @@ public class Village extends GenericModel {
             for (Member m : work.get(Skill.Hunter)) {
                 Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
                 guardIds.add(target.memberId);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, String.format(Constants.GUARD_RESULT, target.name));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.GUARD_RESULT, target.name)+(m.isCommitable()?"":Constants.RANDOM));
             }
         }
         // 襲撃/無残メッセージと襲撃
@@ -397,10 +405,10 @@ public class Village extends GenericModel {
         } else {
             if (state == State.Day) {
                 // 投票内容
-                Res.createNewPersonalMessage(this, me, Permission.Personal, String.format(Constants.VOTE_ACTION, me.name, first.name));
+                Res.createNewPersonalMessage(this, me, Permission.Personal, Skill.Dummy, String.format(Constants.VOTE_ACTION, me.name, first.name));
             } else {
                 // 能力の行使内容
-                Res.createNewPersonalMessage(this, me, Permission.Personal, String.format(Constants.ACTION_MESSAGE.get(me.skill), me.name, first.name));
+                Res.createNewPersonalMessage(this, me, Permission.Personal, me.skill, String.format(Constants.ACTION_MESSAGE.get(me.skill), me.name, first.name));
             }
         }
 

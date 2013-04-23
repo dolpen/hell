@@ -1,5 +1,6 @@
 package models;
 
+import com.google.common.base.Objects;
 import consts.Constants;
 import models.enums.Group;
 import models.enums.LogType;
@@ -110,7 +111,7 @@ public class Res extends Model {
         return r.save() != null;
     }
 
-    public static boolean createNewPersonalMessage(Village village, Member member, Permission permission, String body) {
+    public static boolean createNewPersonalMessage(Village village, Member member, Permission permission, Skill skill, String body) {
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;
@@ -118,7 +119,7 @@ public class Res extends Model {
         r.dayCount = village.dayCount;
         r.postDate = new Date();
         r.permission = permission;
-        r.skill = member.skill;
+        r.skill = Objects.firstNonNull(skill, member.skill);
         r.body = body;
         r.logType = LogType.System;
         return r.save() != null;

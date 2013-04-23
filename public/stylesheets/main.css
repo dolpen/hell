@@ -10,6 +10,9 @@
 .log_wisper {
     background: #888888;
 }
+.log_spirit {
+    background : #8888ff;
+}
 
 
 /* ログパーミッションの種別 */
@@ -17,19 +20,19 @@
 }
 
 .pm_werewolf,.pm_insane,.pm_fanatic,.pm_crazy {
-    background: #a9302a;
+    background: #ff8888;
 }
 .pm_augur {
-    background: #aa88ff;
+    background: #dd88ff;
 }
 .pm_mystic {
-     background: #002a80;
+     background: #aaaaff;
  }
 .pm_freemason,.pm_hunter,.pm_stigmata,.pm_villager{
-    background: #408140;
+    background: #aaffaa;
 }
 .pm_hamster{
-    background: #888800;
+    background: #ffff99;
 }
 .pm_upid,.pm_wooer{
     background: #ff88ff;
