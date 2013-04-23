@@ -118,7 +118,7 @@ public class Res extends Model {
         r.dayCount = village.dayCount;
         r.postDate = new Date();
         r.permission = permission;
-        r.skill = Skill.Dummy;
+        r.skill = member.skill;
         r.body = body;
         r.logType = LogType.System;
         return r.save() != null;
