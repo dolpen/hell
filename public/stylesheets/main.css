@@ -1,0 +1,36 @@
+/* ログの種別 */
+
+.log_system {
+    border-left: 10px solid #888800;
+}
+.log_say {
+    border-left: 10px solid #dddddd;
+}
+
+.log_wisper {
+    background: #888888;
+}
+
+
+/* ログパーミッションの種別 */
+.pm_dummy {
+}
+
+.pm_werewolf,.pm_insane,.pm_fanatic,.pm_crazy {
+    background: #a9302a;
+}
+.pm_augur {
+    background: #aa88ff;
+}
+.pm_mystic {
+     background: #002a80;
+ }
+.pm_freemason,.pm_hunter,.pm_stigmata,.pm_villager{
+    background: #408140;
+}
+.pm_hamster{
+    background: #888800;
+}
+.pm_upid,.pm_wooer{
+    background: #ff88ff;
+}

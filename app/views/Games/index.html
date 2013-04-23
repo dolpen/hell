@@ -26,7 +26,7 @@
 <table class="table">
 #{list items:logs, as:'log'}
     #{set roar : log.permission == models.enums.Permission.Group && (log.skill == models.enums.Skill.Werewolf || log.skill == models.enums.Skill.Crazy ) /}
-    <tr style="#{if log.permission==models.enums.Permission.Personal}background:#dddddd;#{/if}#{if log.permission==models.enums.Permission.Spirit}background:#88dddd;#{/if}#{if roar}background:#ffaaaa;#{/if}">
+    <tr class="${log.logClass}">
         <td>#{if roar && !closet && !finished}遠吠え#{/if}#{else}${log.name}#{/else}</td>
         <td>#{if roar && !closet && !finished}わおーん#{/if}#{else}${log.body.nl2br()}#{/else}</td>
     </tr>

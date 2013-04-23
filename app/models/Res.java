@@ -49,7 +49,35 @@ public class Res extends Model {
         return find("villageId = ?1 and dayCount = ?2 order by postDate asc", village.villageId, dayCount).fetch();
     }
 
-
+    public String getLogClass() {
+        String res = "";
+        if (logType == LogType.Say) { // say
+            res += "log_say";
+            switch (permission) {
+                case Personal:
+                    res += " log_wisper";
+                    break;
+                case Group:
+                    res += " pm_" + skill.name().toLowerCase();
+                    break;
+                case Spirit:
+                    res += " log_spirit";
+                    break;
+            }
+        } else { // system message
+            res += "log_system";
+            switch (permission) {
+                case Personal:
+                case Group:
+                    res += " pm_" + skill.name().toLowerCase();
+                    break;
+                case Spirit:
+                    res += " log_spirit";
+                    break;
+            }
+        }
+        return res;
+    }
 
 
     public static boolean createNewRes(Village village, Member member, Permission permission, String body) {
