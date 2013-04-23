@@ -52,7 +52,9 @@ public class Games extends Controller {
         village.tryCommit();
         User user = tryGetUser();
         if (day == null) day = village.dayCount;
+
         Member me = getMember(village, user);
+        List<Member> members = Member.findByVillage(village);
         boolean exist = me != null;
         boolean alive = exist && me.isAlive();
         boolean admin = village.isYours(user);
@@ -61,7 +63,6 @@ public class Games extends Controller {
         boolean finished = village.isFinished();
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
         List<Character> characters = CharacterUtil.getCharacters(village, me);
-        List<Member> members = Member.findAliveExcludeMe(village, me);
         render(village, logs, exist, alive, me, members, characters, admin, closet, ability, finished);
     }
 

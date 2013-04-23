@@ -2,7 +2,19 @@
 #{set 'moreScripts'}
     #{script src:'village.js'/}
 #{/set}
-#{set 'navi'} #{/set}
+#{set 'navi'}
+<ul>
+    #{list items:members, as:'member'}
+        <li>
+        ${member.name}#{if !member.alive}(死亡)#{/if}
+        </li>
+    #{/list}
+    <li>
+        残り時間 : <span id="time">0</span>
+    </li>
+</ul>
+
+#{/set}
 <h2>
     <i class="icon-cog" style="margin-top: 6px;"></i>${village.villageId}村 ${village.name}
 </h2>
@@ -19,10 +31,6 @@
         <td>#{if roar && !closet && !finished}わおーん#{/if}#{else}${log.body.nl2br()}#{/else}</td>
     </tr>
 #{/list}
-    <tr>
-        <td>残り時間</td>
-        <td id="time">0</td>
-    </tr>
 </table>
 
 #{if admin && village.state == models.enums.State.Prologue}
@@ -38,9 +46,9 @@
 #{/if}
 
 #{if me != null}
-    <p>あなた:${me.name}#{if village.state != models.enums.State.Prologue}(${me.skill.label},${me.team.label})#{/if}</p>
+<p>あなた:${me.name}#{if village.state != models.enums.State.Prologue}(${me.skill.label},${me.team.label})#{/if}</p>
     #{if village.state == models.enums.State.Epilogue}
-        <p>#{if village.winner == me.team}勝利しました#{/if}#{else}敗北しました#{/else}</p>
+    <p>#{if village.winner == me.team}勝利しました#{/if}#{else}敗北しました#{/else}</p>
     #{/if}
 #{/if}
 
@@ -54,10 +62,11 @@
             <legend>能力</legend>
             <div class="control-group">
                 <label class="control-label" for="target_select">対象</label>
+
                 <div class="controls">
                     <select name="firstId" id="target_select">
-                        #{list items:members, as:'member'}
-                            <option value="${member.memberId}">${member.name}</option>#{/list}
+                        #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
+                            <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
                     </select>
                 </div>
             </div>
@@ -74,10 +83,11 @@
             <legend>投票</legend>
             <div class="control-group">
                 <label class="control-label" for="target_select">対象</label>
+
                 <div class="controls">
                     <select name="firstId" id="target_select">
-                        #{list items:members, as:'member'}
-                            <option value="${member.memberId}">${member.name}</option>#{/list}
+                        #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
+                            <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
                     </select>
                 </div>
             </div>
@@ -99,6 +109,7 @@
                 <legend>発言</legend>
                 <div class="control-group">
                     <label class="control-label" for="body_text">本文</label>
+
                     <div class="controls">
                         <textarea name="text" class="span4" id="body_text"></textarea>
                     </div>
@@ -116,6 +127,7 @@
                 <legend>秘匿会話</legend>
                 <div class="control-group">
                     <label class="control-label" for="body_c_text">本文</label>
+
                     <div class="controls">
                         <textarea name="text" class="span4" id="body_c_text"></textarea>
                     </div>
@@ -151,6 +163,7 @@
         <legend>つぶやき</legend>
         <div class="control-group">
             <label class="control-label" for="body_w_text">本文</label>
+
             <div class="controls">
                 <textarea name="text" class="span4" id="body_w_text"></textarea>
             </div>

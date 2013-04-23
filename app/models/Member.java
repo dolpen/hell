@@ -37,9 +37,9 @@ public class Member extends GenericModel {
         return find("village = ?1 and alive = ?2", village, true).fetch();
     }
 
-    public static List<Member> findAliveExcludeMe(Village village, Member me) {
+    public static List<Member> findByVillageExcludeMe(Village village, Member me) {
         if (me == null) return Lists.newArrayList();
-        return find("village = ?1 and alive = ?2 and memberId != ?3", village, true, me.memberId).fetch();
+        return find("village = ?1 and memberId != ?2", village, me.memberId).fetch();
     }
 
     public static int countByVillage(Village village) {
