@@ -35,6 +35,7 @@
 
 #{if admin && village.state == models.enums.State.Prologue}
 <!-- 管理 -->
+<p><a href="@{Options.update(village.villageId)}">村情報の更新</a></p>
 <form class="form-horizontal" action="@{Options.startVillage}" method="post">
     <fieldset>
         <div class="form-actions">
