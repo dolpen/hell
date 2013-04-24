@@ -1,5 +1,5 @@
 #{extends 'main.html' /} #{set title:'Home' /} #{set 'navi'}
-<a href="@{Options.settle}">開村</a>
+#{if session.user_id != null}<a href="@{Options.settle}">開村</a>#{/if}
 #{/set}
 
 

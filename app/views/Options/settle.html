@@ -1,13 +1,13 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
-<form class="form-horizontal" action="@{Options.settleVillage}" method="post">
+<form class="form-horizontal form-stacked" action="@{Options.settleVillage}" method="post">
     <fieldset>
         <legend>登録</legend>
         <div class="control-group">
             <label class="control-label" for="name_text">村名</label>
             <div class="controls">
-                <input type="text" name="name" class="input-xlarge" id="name_text" value="村">
+                <input type="text" name="name" class="xlarge" id="name_text" value="村">
             </div>
         </div>
         <div class="control-group">
@@ -17,15 +17,21 @@
             </div>
         </div>
         <div class="control-group">
+            <label class="control-label" for="dummy_check">ダミー</label>
+            <div class="controls">
+                <input type="checkbox" name="dummy" class="xlarge" id="dummy_check" value="1">
+            </div>
+        </div>
+        <div class="control-group">
             <label class="control-label" for="day_text">昼の時間</label>
             <div class="controls">
-                <input type="text" name="dayTime" class="input-xlarge" id="day_text" value="5">分
+                <input type="text" name="dayTime" class="xlarge" id="day_text" value="5">分
             </div>
         </div>
         <div class="control-group">
             <label class="control-label" for="night_text">夜の時間</label>
             <div class="controls">
-                <input type="text" name="nightTime" class="input-xlarge" id="night_text" value="3">分
+                <input type="text" name="nightTime" class="xlarge" id="night_text" value="3">分
             </div>
         </div>
         <div class="form-actions">

@@ -1,12 +1,14 @@
 package controllers;
 
 
+import com.google.common.collect.ImmutableMap;
 import consts.CookieName;
 import models.Character;
 import models.*;
 import models.enums.Permission;
 import models.enums.State;
 import play.mvc.Controller;
+import play.mvc.Router;
 import play.mvc.Util;
 import utils.CharacterUtil;
 import utils.ResUtil;
@@ -39,6 +41,16 @@ public class Games extends Controller {
     @Util
     static Member getMember(Village village, User user) {
         return user == null ? null : Member.findByIds(village, user);
+    }
+
+
+    /**
+     * アンカーつきで村ビューに戻す
+     *
+     * @param villageId 村ID
+     */
+    private static void redirectToVillage(Long villageId) {
+        redirect(Router.getFullUrl("Games.index", ImmutableMap.of("villageId", (Object) villageId)) + "#form");
     }
 
     /**
@@ -74,7 +86,7 @@ public class Games extends Controller {
         if (village.state == State.Night) {
             village.setTarget(user, firstId, secondId);
         }
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     // 投票
@@ -84,49 +96,49 @@ public class Games extends Controller {
         if (village.state == State.Day) {
             village.setTarget(user, firstId, null);
         }
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void say(Long villageId, String text) {
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
-            index(villageId, null);
+            redirectToVillage(villageId);
         }
         if (village.state == State.Night) wisper(villageId, text);
         Res.createNewRes(village, Member.findByIds(village, user), Permission.Public, text);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void wisper(Long villageId, String text) {
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
-            index(villageId, null);
+            redirectToVillage(villageId);
         }
         Res.createNewRes(village, Member.findByIds(village, user), Permission.Personal, text);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void spirit(Long villageId, String text) {
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
-            index(villageId, null);
+            redirectToVillage(villageId);
         }
         Res.createNewRes(village, Member.findByIds(village, user), Permission.Spirit, text);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void closet(Long villageId, String text) {
         Village village = getVillage(villageId);
         User user = getUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
-            index(villageId, null);
+            redirectToVillage(villageId);
         }
         if (village.state != State.Night) wisper(villageId, text);
         Res.createNewRes(village, Member.findByIds(village, user), Permission.Group, text);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void enter(Long villageId, Long characterId) {
@@ -136,13 +148,13 @@ public class Games extends Controller {
         if (character == null)
             notFound();
         village.enter(user, character);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 
     public static void leave(Long villageId) {
         User user = getUser();
         Village village = getVillage(villageId);
         village.leave(user);
-        index(villageId, null);
+        redirectToVillage(villageId);
     }
 }
