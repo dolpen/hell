@@ -18,10 +18,11 @@ public class SkillUtils {
             return Lists.newArrayList();
         List<Skill> skills = Lists.newArrayList();
         for (char signal : form.replaceAll("[\\n\\r]+", "").toCharArray()) {
-            Skill s = Skill.bySign(new String(new char[] { signal }));
-            if (s == null){
-                System.err.println("err in : "+String.format("%x", Integer.valueOf(signal)));
+            Skill s = Skill.bySign(new String(new char[]{signal}));
+            if (s == null) {
                 throw new IllegalArgumentException("不正な入力");
+            } else if (!s.isImplimented()) {
+                throw new IllegalArgumentException("未実装役職を使用しようとしました");
             }
             skills.add(s);
         }
@@ -33,19 +34,16 @@ public class SkillUtils {
      */
     public static Map<Integer, List<Skill>> getSkillsMapFromFormStr(String formSet) {
         if (Strings.isNullOrEmpty(formSet)) {
-            System.err.println("inv form");
-            throw new IllegalArgumentException("不正な入力");
+            throw new IllegalArgumentException("入力がありません");
         }
-
         String[] forms = formSet.split("\n");
         Map<Integer, List<Skill>> skillsMap = Maps.newHashMap();
         for (String form : forms) {
             List<Skill> skills = getSkillsFromFormStr(form);
             if (skills.isEmpty())
                 continue;
-            if (skillsMap.containsKey(skills.size())){
-                System.err.println("dup key");
-                throw new IllegalArgumentException("重複する編成");
+            if (skillsMap.containsKey(skills.size())) {
+                throw new IllegalArgumentException("重複する編成です");
             }
             skillsMap.put(skills.size(), skills);
         }
@@ -54,7 +52,8 @@ public class SkillUtils {
 
     /**
      * 編成表と要求人数から対応する役職編成を取り出す
-     * @param formSet 編成表
+     *
+     * @param formSet     編成表
      * @param memberCount 人数
      * @return 編成表が正常かつ、対応するものがあれば返す。
      */

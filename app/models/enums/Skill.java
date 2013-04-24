@@ -5,20 +5,20 @@ package models.enums;
  */
 public enum Skill {
 
-    Dummy(0, "ダミー", "ダ"),
-    Villager(1, "村人", "村"), // 実装済み
-    Augur(2, "占い師", "占"), // 実装済み
-    Mystic(3, "霊能者", "霊"), // 実装済み
-    Hunter(4, "狩人", "狩"), // 実装済み
-    Freemason(5, "共有", "共"),
-    Stigmata(6, "聖痕者", "聖"), // 番号管理めどいので当分未実装で行きたい
-    Werewolf(7, "人狼", "狼"), // 実装済み
-    Insane(8, "狂人", "狂"), // 実装済み
-    Fanatic(9, "狂信者", "信"),
-    Crazy(10, "Ｃ国狂人", "Ｃ"),
-    Hamster(11, "妖魔", "妖"),
-    Cupid(12, "キューピッド", "Ｑ"),
-    Wooer(13, "求愛者", "求");
+    Dummy(0, "ダミー", "ダ", false),
+    Villager(1, "村人", "村", true), // 実装済み
+    Augur(2, "占い師", "占", true), // 実装済み
+    Mystic(3, "霊能者", "霊", true), // 実装済み
+    Hunter(4, "狩人", "狩", true), // 実装済み
+    Freemason(5, "共有", "共", false),
+    Stigmata(6, "聖痕者", "聖", false), // 番号管理めどいので当分未実装で行きたい
+    Werewolf(7, "人狼", "狼", true), // 実装済み
+    Insane(8, "狂人", "狂", true), // 実装済み
+    Fanatic(9, "狂信者", "信", false),
+    Crazy(10, "Ｃ国狂人", "Ｃ", false),
+    Hamster(11, "妖魔", "妖", false),
+    Cupid(12, "キューピッド", "Ｑ", false),
+    Wooer(13, "求愛者", "求", false);
 
     private int value;
 
@@ -26,10 +26,13 @@ public enum Skill {
 
     private String sign;
 
-    private Skill(int value, String label, String sign) {
+    private boolean impl;
+
+    private Skill(int value, String label, String sign, boolean impl) {
         this.value = value;
         this.label = label;
         this.sign = sign;
+        this.impl = impl;
     }
 
     public int getValue() {
@@ -43,6 +46,10 @@ public enum Skill {
 
     public String getSign() {
         return sign;
+    }
+
+    public boolean isImplimented() {
+        return impl;
     }
 
 
