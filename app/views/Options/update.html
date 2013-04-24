@@ -1,0 +1,41 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+
+<form class="form-horizontal form-stacked" action="@{Options.updateVillage}" method="post">
+    <fieldset>
+        <legend>変更</legend>
+        <div class="control-group">
+            <label class="control-label" for="name_text">村名</label>
+            <div class="controls">
+                <input type="text" name="name" class="xlarge" id="name_text" value="村">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="form_text">編成</label>
+            <div class="controls">
+                <textarea name="form" class="span4" id="form_text">${consts.Constants.FORM_CATTLE}</textarea>
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="dummy_check">ダミー</label>
+            <div class="controls">
+                <input type="checkbox" name="dummy" class="xlarge" id="dummy_check" value="1">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="day_text">昼の時間</label>
+            <div class="controls">
+                <input type="text" name="dayTime" class="xlarge" id="day_text" value="5">分
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="night_text">夜の時間</label>
+            <div class="controls">
+                <input type="text" name="nightTime" class="xlarge" id="night_text" value="3">分
+            </div>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">登録する</button>
+        </div>
+    </fieldset>
+</form>
