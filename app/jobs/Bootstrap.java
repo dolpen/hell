@@ -1,7 +1,6 @@
 package jobs;
 
-import play.Play;
-import play.Play.Mode;
+import models.Character;
 import play.jobs.Job;
 import play.jobs.OnApplicationStart;
 
@@ -14,9 +13,7 @@ public class Bootstrap extends Job {
     @Override
     public void doJob() throws Exception {
         super.doJob();
-
-        // テスト用データの生成
-        if (Play.mode == Mode.DEV) {
+        if (Character.count() == 0) {
             new TestImporter().now();
         }
     }

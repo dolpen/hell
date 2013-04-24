@@ -1,14 +1,10 @@
 package models;
 
-import java.util.List;
+import play.db.jpa.GenericModel;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
-
-import play.db.jpa.GenericModel;
 
 @Entity(name = "character")
 public class Character extends GenericModel {
@@ -18,9 +14,6 @@ public class Character extends GenericModel {
     public Long characterId;
 
     public String name;
-
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "character")
-    public List<Member> members;
 
     public static Character makeNewCharacter(String name) {
         Character character = new Character();

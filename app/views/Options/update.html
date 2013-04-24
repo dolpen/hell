@@ -17,9 +17,10 @@
             </div>
         </div>
         <div class="control-group">
-            <label class="control-label" for="dummy_check">ダミー</label>
+            <label class="control-label">ダミー</label>
             <div class="controls">
-                <input type="checkbox" name="dummy" class="xlarge" id="dummy_check" value="1"#{if village.dummyMemberId!=null && village.dummyMemberId > 0} checked#{/if}>
+                <input type="radio" name="dummy" class="xlarge" value="true"#{if village.dummyMemberId!=null && village.dummyMemberId > 0} checked#{/if}>あり
+                <input type="radio" name="dummy" class="xlarge" value="false"#{if village.dummyMemberId==null || village.dummyMemberId <= 0} checked#{/if}>なし
             </div>
         </div>
         <div class="control-group">
@@ -34,6 +35,7 @@
                 <input type="text" name="nightTime" class="xlarge" id="night_text" value="${village.nightTime}">分
             </div>
         </div>
+        <imput type="hidden" name="villageId" value="${village.villageId}">
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">更新する</button>
         </div>

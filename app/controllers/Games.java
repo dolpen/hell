@@ -1,7 +1,7 @@
 package controllers;
 
 
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import consts.CookieName;
 import models.Character;
 import models.*;
@@ -14,6 +14,7 @@ import utils.CharacterUtil;
 import utils.ResUtil;
 
 import java.util.List;
+import java.util.Map;
 
 public class Games extends Controller {
 
@@ -50,7 +51,12 @@ public class Games extends Controller {
      * @param villageId 村ID
      */
     private static void redirectToVillage(Long villageId) {
-        redirect(Router.getFullUrl("Games.index", ImmutableMap.of("villageId", (Object) villageId)) + "#form");
+        if (villageId == null) {
+            Application.index();
+        }
+        Map<String, Object> args = Maps.newHashMap();
+        args.put("villageId", villageId);
+        redirect(Router.getFullUrl("Games.index", args) + "#form");
     }
 
     /**

@@ -1,8 +1,8 @@
 package controllers;
 
+import consts.CookieName;
 import models.User;
 import play.mvc.Controller;
-import consts.CookieName;
 
 public class Accounts extends Controller {
 
@@ -32,4 +32,5 @@ public class Accounts extends Controller {
         User.createNewUser(name, pass);
         login(name, pass);
     }
+
 }
