@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
-@Entity(name = "character")
+@Entity(name = "chara")
 public class Chara extends GenericModel {
 
     @Id
