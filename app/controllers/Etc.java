@@ -1,22 +1,18 @@
-package jobs;
+package controllers;
 
 import models.Character;
 import models.*;
-import play.jobs.Job;
+import play.mvc.Controller;
 
-public class TestImporter extends Job {
+public class Etc extends Controller {
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void doJob() throws Exception {
-        super.doJob();
+
+    public static void reset() {
         Village.deleteAll();
         Member.deleteAll();
         Res.deleteAll();
 
-        Character.deleteAll();
+        models.Character.deleteAll();
         Character.makeNewCharacter("アヤメ");
         Character.makeNewCharacter("カレン");
         Character.makeNewCharacter("フラン");
@@ -25,4 +21,6 @@ public class TestImporter extends Job {
 
         User.deleteAll();
     }
+
+
 }

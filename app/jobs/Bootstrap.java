@@ -13,8 +13,5 @@ public class Bootstrap extends Job {
     @Override
     public void doJob() throws Exception {
         super.doJob();
-        if (Character.count() == 0) {
-            new TestImporter().now();
-        }
     }
 }
