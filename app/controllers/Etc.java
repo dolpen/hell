@@ -1,6 +1,6 @@
 package controllers;
 
-import models.Character;
+import models.Chara;
 import models.*;
 import play.mvc.Controller;
 
@@ -12,12 +12,12 @@ public class Etc extends Controller {
         Member.deleteAll();
         Res.deleteAll();
 
-        models.Character.deleteAll();
-        Character.makeNewCharacter("アヤメ");
-        Character.makeNewCharacter("カレン");
-        Character.makeNewCharacter("フラン");
-        Character.makeNewCharacter("リディア");
-        Character.makeNewCharacter("エリカ");
+        Chara.deleteAll();
+        Chara.makeNewCharacter("アヤメ");
+        Chara.makeNewCharacter("カレン");
+        Chara.makeNewCharacter("フラン");
+        Chara.makeNewCharacter("リディア");
+        Chara.makeNewCharacter("エリカ");
 
         User.deleteAll();
     }

@@ -7,7 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 @Entity(name = "character")
-public class Character extends GenericModel {
+public class Chara extends GenericModel {
 
     @Id
     @GeneratedValue
@@ -15,17 +15,17 @@ public class Character extends GenericModel {
 
     public String name;
 
-    public static Character makeNewCharacter(String name) {
-        Character character = new Character();
-        character.name = name;
-        return character.save();
+    public static Chara makeNewCharacter(String name) {
+        Chara chara = new Chara();
+        chara.name = name;
+        return chara.save();
     }
 
-    public static Character findById(Long characterId) {
+    public static Chara findById(Long characterId) {
         return find("characterId = ?1", characterId).first();
     }
 
-    public static Character dummy() {
+    public static Chara dummy() {
         return findById(1L);
     }
 }

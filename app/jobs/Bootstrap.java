@@ -1,6 +1,5 @@
 package jobs;
 
-import models.Character;
 import play.jobs.Job;
 import play.jobs.OnApplicationStart;
 

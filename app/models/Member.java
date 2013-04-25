@@ -22,7 +22,7 @@ public class Member extends GenericModel {
     public User user; // 中身
     public String name;
     @ManyToOne(cascade = CascadeType.DETACH)
-    public Character character; // 使用キャラ
+    public Chara chara; // 使用キャラ
     public Skill skill = Skill.Villager; // 所持能力
     public Long targetMemberId = 0L; // 能力行使対象
     public Long targetMemberId2 = 0L; // 能力行使対象
@@ -58,9 +58,9 @@ public class Member extends GenericModel {
         return find("village = ?1 and memberId = ?2", village, memberId).first();
     }
 
-    private static String uniqueName(Village village, Character character) {
+    private static String uniqueName(Village village, Chara chara) {
         List<Member> members = findByVillage(village);
-        String prefix = character.name;
+        String prefix = chara.name;
         Set<String> names = Sets.newHashSet();
         for (Member m : members) {
             names.add(m.name);
@@ -75,14 +75,14 @@ public class Member extends GenericModel {
         return prefix + length;
     }
 
-    public static Member enter(Village village, User user, Character character) {
+    public static Member enter(Village village, User user, Chara chara) {
         if (!exist(village, user)) {
             Member m = new Member();
             m.village = village;
-            m.character = character;
+            m.chara = chara;
             m.user = user;
             m.skill = Skill.Villager;
-            m.name = uniqueName(village, character);
+            m.name = uniqueName(village, chara);
             return m.save();
         }
         return null;

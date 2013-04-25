@@ -199,7 +199,7 @@
 
                 <div class="controls">
                     <select name="characterId" class="span4" id="chara_select">
-                        #{list items:characters , as:'chara'}
+                        #{list items:charas , as:'chara'}
                             <option value="${chara.characterId}">${chara.name}</option>#{/list}
                     </select>
                 </div>

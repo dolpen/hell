@@ -131,7 +131,7 @@ public class Village extends GenericModel {
     private Long enterDummy() {
         if (hasDummy()) return dummyMemberId;
         if (!canEnter()) return null;
-        Member m = enter(null, Character.dummy());
+        Member m = enter(null, Chara.dummy());
         if (m == null) return null;
         dummyMemberId = m.memberId;
         return m.memberId;
@@ -352,12 +352,12 @@ public class Village extends GenericModel {
      * ユーザーの入村
      *
      * @param user      ユーザー
-     * @param character キャラクター
+     * @param chara キャラクター
      * @return メンバー
      */
-    public Member enter(User user, Character character) {
+    public Member enter(User user, Chara chara) {
         if (!canEnter()) return null;
-        Member m = Member.enter(this, user, character);
+        Member m = Member.enter(this, user, chara);
         if (m == null) return null;
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VILLAGE_ENTER, m.name));
         return m;

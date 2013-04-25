@@ -3,7 +3,7 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import consts.CookieName;
-import models.Character;
+import models.Chara;
 import models.*;
 import models.enums.Permission;
 import models.enums.State;
@@ -80,8 +80,8 @@ public class Games extends Controller {
         boolean ability = exist && me.skill.hasAbility();
         boolean finished = village.isFinished();
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
-        List<Character> characters = CharacterUtil.getCharacters(village, me);
-        render(village, logs, exist, alive, me, members, characters, admin, closet, ability, finished);
+        List<Chara> charas = CharacterUtil.getCharacters(village, me);
+        render(village, logs, exist, alive, me, members, charas, admin, closet, ability, finished);
     }
 
 
@@ -150,10 +150,10 @@ public class Games extends Controller {
     public static void enter(Long villageId, Long characterId) {
         User user = getUser();
         Village village = getVillage(villageId);
-        Character character = Character.findById(characterId);
-        if (character == null)
+        Chara chara = Chara.findById(characterId);
+        if (chara == null)
             notFound();
-        village.enter(user, character);
+        village.enter(user, chara);
         redirectToVillage(villageId);
     }
 
