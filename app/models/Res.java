@@ -8,7 +8,9 @@ import models.enums.Permission;
 import models.enums.Skill;
 import play.db.jpa.Model;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
@@ -18,6 +20,8 @@ public class Res extends Model {
 
     public Long memberId;
     public Long villageId;
+    @ManyToOne(cascade = CascadeType.DETACH)
+    public Chara chara;
     public String name;
     public String body;
     public int dayCount;
@@ -88,6 +92,7 @@ public class Res extends Model {
         r.memberId = member.memberId;
         r.villageId = village.villageId;
         r.name = member.name;
+        r.chara = member.chara;
         r.dayCount = village.dayCount;
         r.postDate = new Date();
         r.permission = permission;
@@ -101,6 +106,7 @@ public class Res extends Model {
         Res r = new Res();
         r.memberId = 0L;
         r.villageId = village.villageId;
+        r.chara = null;
         r.name = Constants.SYSTEM_NAME;
         r.dayCount = village.dayCount;
         r.postDate = new Date();
@@ -115,6 +121,7 @@ public class Res extends Model {
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;
+        r.chara = null;
         r.name = Constants.SYSTEM_NAME;
         r.dayCount = village.dayCount;
         r.postDate = new Date();

@@ -27,7 +27,8 @@ public class Options extends Controller {
             Application.index();
         if (Strings.isNullOrEmpty(name))
             settle();
-        Village.settle(user, name, form, dayTime, nightTime, dummy);
+        // TODO キャラセット固定
+        Village.settle(user, name, form, dayTime, nightTime, dummy,1L);
         Application.index();
     }
 

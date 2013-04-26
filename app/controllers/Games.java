@@ -150,10 +150,7 @@ public class Games extends Controller {
     public static void enter(Long villageId, Long characterId) {
         User user = getUser();
         Village village = getVillage(villageId);
-        Chara chara = Chara.findById(characterId);
-        if (chara == null)
-            notFound();
-        village.enter(user, chara);
+        village.enter(user, characterId);
         redirectToVillage(villageId);
     }
 

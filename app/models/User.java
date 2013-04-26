@@ -15,8 +15,6 @@ public class User extends GenericModel {
     public Long userId;
     public String name;
     public String hash;
-    @OneToMany(cascade = CascadeType.DETACH, mappedBy = "user")
-    public List<Member> members;
 
     public static User get(String name, String pass) {
         return find("name = ?1 and hash = ?2", name, encode(pass)).first();

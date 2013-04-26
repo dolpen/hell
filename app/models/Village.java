@@ -28,6 +28,7 @@ public class Village extends GenericModel {
     @GeneratedValue
     public Long villageId;
     public Long userId;
+    public Long partyId;
     @OneToMany(cascade = CascadeType.DETACH, mappedBy = "village")
     public List<Member> members;
     // 設定
@@ -69,13 +70,14 @@ public class Village extends GenericModel {
      * @param dummy     ダミーを含むかどうか
      * @return 立った村
      */
-    public static Village settle(User user, String name, String form, int dayTime, int nightTime, boolean dummy) {
+    public static Village settle(User user, String name, String form, int dayTime, int nightTime, boolean dummy, Long partyId) {
         Village v = new Village();
         v.userId = user.userId;
         v.name = name;
         v.form = form;
         v.dayTime = dayTime;
         v.nightTime = nightTime;
+        v.partyId = partyId;
         if (!v.parseOption()) return null;
         v = v.save();
         if (v == null) return null;
@@ -131,7 +133,7 @@ public class Village extends GenericModel {
     private Long enterDummy() {
         if (hasDummy()) return dummyMemberId;
         if (!canEnter()) return null;
-        Member m = enter(null, Chara.dummy());
+        Member m = enter(null, 0L);
         if (m == null) return null;
         dummyMemberId = m.memberId;
         return m.memberId;
@@ -350,12 +352,15 @@ public class Village extends GenericModel {
     /**
      * ユーザーの入村
      *
-     * @param user      ユーザー
-     * @param chara キャラクター
+     * @param user        ユーザー
+     * @param characterId キャラクターID
      * @return メンバー
      */
-    public Member enter(User user, Chara chara) {
+    public Member enter(User user, Long characterId) {
         if (!canEnter()) return null;
+        Party p = Party.findById(partyId);
+        Chara chara = Chara.findById(p, characterId);
+        if (chara == null) return null;
         Member m = Member.enter(this, user, chara);
         if (m == null) return null;
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VILLAGE_ENTER, m.name));

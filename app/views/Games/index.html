@@ -27,7 +27,14 @@
 #{list items:logs, as:'log'}
     #{set roar : log.permission == models.enums.Permission.Group && (log.skill == models.enums.Skill.Werewolf || log.skill == models.enums.Skill.Crazy ) /}
     <tr class="${log.logClass}">
-        <td>#{if roar && !closet && !finished}遠吠え#{/if}#{else}${log.name}#{/else}</td>
+        <td>#{if roar && !closet && !finished}遠吠え#{/if}
+            #{elseif log.chara != null}
+            <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61" width="48" /><br />
+        ${log.name}
+        #{/elseif}
+        #{else}
+        ${log.name}
+        #{/else}</td>
         <td>#{if roar && !closet && !finished}わおーん#{/if}#{else}${log.body.nl2br()}#{/else}</td>
     </tr>
 #{/list}
