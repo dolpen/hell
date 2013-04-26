@@ -51,6 +51,9 @@ public class Member extends GenericModel {
     }
 
     public static Member findByIds(Village village, User user) {
+        if (user == null) {
+            return find("village = ?1 and user is null", village).first();
+        }
         return find("village = ?1 and user = ?2", village, user).first();
     }
 

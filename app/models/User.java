@@ -2,6 +2,7 @@ package models;
 
 import com.google.common.base.Strings;
 import play.db.jpa.GenericModel;
+import play.db.jpa.JPA;
 
 import javax.persistence.*;
 import java.util.List;

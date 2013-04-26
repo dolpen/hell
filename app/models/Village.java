@@ -142,8 +142,7 @@ public class Village extends GenericModel {
      */
     public void leaveDummy() {
         if (!canLeave() || !hasDummy()) return;
-        Member m = Member.leave(this, null);
-        if (m == null) return;
+        leave(null);
         dummyMemberId = null;
     }
 

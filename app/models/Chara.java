@@ -13,6 +13,7 @@ public class Chara extends GenericModel {
     @GeneratedValue
     public Long characterId;
 
+
     public String name;
 
     public static Chara makeNewCharacter(String name) {
@@ -26,6 +27,6 @@ public class Chara extends GenericModel {
     }
 
     public static Chara dummy() {
-        return findById(1L);
+        return all().first();
     }
 }
