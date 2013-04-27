@@ -50,6 +50,7 @@ public class MemberUtil {
 
         if (dummyMemberId != null) {
             Skill forDummy = skills.remove(0);
+            if(forDummy!=Skill.Villager)return false;
             Member dummy = null;
             for (int i = 0; i < l; i++) {
                 Member m = members.get(i);
