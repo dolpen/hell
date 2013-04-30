@@ -183,14 +183,18 @@ public class Village extends GenericModel {
             return false;
         List<Skill> skills = map.get(memberCount);
         List<Member> members = Member.findByVillage(this);
-        MemberUtil.setSkill(skills, members, dummyMemberId);
+        if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
         Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
         List<String> countMessages = Lists.newArrayList();
+        int villager = work.get(Skill.Dummy).size() + work.get(Skill.Villager).size();
+        if (villager != 0) countMessages.add(Skill.Villager.getLabel() + "が" + villager + "人");
         for (Skill s : Skill.values()) {
+            if (s == Skill.Dummy || s == Skill.Villager) continue;
             int count = work.get(s).size();
             if (count == 0) continue;
             countMessages.add(s.getLabel() + "が" + count + "人");
         }
+
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VILLAGE_COUNT, Joiner.on("、").join(countMessages)));
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
