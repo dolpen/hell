@@ -67,160 +67,162 @@
 
 <input type="hidden" id="timeLimit" value="${village.commitTime}"/>
 
-#{if exist && alive}
-<!-- 能力や投票 -->
-    #{if ability && village.state == models.enums.State.Night}
-    <form class="form-horizontal" action="@{Games.target}" method="post">
-        <fieldset>
-            <legend>能力</legend>
-            <div class="control-group">
-                <label class="control-label" for="target_select">対象</label>
-
-                <div class="controls">
-                    <select name="firstId" id="target_select">
-                        #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
-                            <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
-                    </select>
-                </div>
-            </div>
-            <div class="form-actions">
-                <input name="villageId" type="hidden" value="${village.villageId}"/>
-                <button type="submit" class="btn btn-primary">決定</button>
-            </div>
-        </fieldset>
-    </form>
-    #{/if}
-    #{elseif village.state == models.enums.State.Day}
-    <form class="form-horizontal" action="@{Games.vote}" method="post">
-        <fieldset>
-            <legend>投票</legend>
-            <div class="control-group">
-                <label class="control-label" for="target_select">対象</label>
-
-                <div class="controls">
-                    <select name="firstId" id="target_select">
-                        #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
-                            <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
-                    </select>
-                </div>
-            </div>
-            <div class="form-actions">
-                <input name="villageId" type="hidden" value="${village.villageId}"/>
-                <button type="submit" class="btn btn-primary">決定</button>
-            </div>
-        </fieldset>
-    </form>
-    #{/elseif}
-#{/if}
-
-#{if exist }
-<!-- 発言 -->
-    #{if alive || finished }
-        #{if village.state != models.enums.State.Night}
-        <form class="form-horizontal" action="@{Games.say}" method="post">
+#{if now}
+    #{if exist && alive}
+    <!-- 能力や投票 -->
+        #{if ability && village.state == models.enums.State.Night}
+        <form class="form-horizontal" action="@{Games.target}" method="post">
             <fieldset>
-                <legend>発言</legend>
+                <legend>能力</legend>
                 <div class="control-group">
-                    <label class="control-label" for="body_text">本文</label>
+                    <label class="control-label" for="target_select">対象</label>
 
                     <div class="controls">
-                        <textarea name="text" class="span4" id="body_text"></textarea>
+                        <select name="firstId" id="target_select">
+                            #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
+                                <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
+                        </select>
                     </div>
                 </div>
                 <div class="form-actions">
                     <input name="villageId" type="hidden" value="${village.villageId}"/>
-                    <button type="submit" class="btn btn-primary">発言する</button>
+                    <button type="submit" class="btn btn-primary">決定</button>
                 </div>
             </fieldset>
         </form>
         #{/if}
-        #{if closet && village.state == models.enums.State.Night}
-        <form class="form-horizontal" action="@{Games.closet}" method="post">
+        #{elseif village.state == models.enums.State.Day}
+        <form class="form-horizontal" action="@{Games.vote}" method="post">
             <fieldset>
-                <legend>秘匿会話</legend>
+                <legend>投票</legend>
                 <div class="control-group">
-                    <label class="control-label" for="body_c_text">本文</label>
+                    <label class="control-label" for="target_select">対象</label>
 
                     <div class="controls">
-                        <textarea name="text" class="span4" id="body_c_text"></textarea>
+                        <select name="firstId" id="target_select">
+                            #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
+                                <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
+                        </select>
                     </div>
                 </div>
                 <div class="form-actions">
                     <input name="villageId" type="hidden" value="${village.villageId}"/>
-                    <button type="submit" class="btn btn-primary">ささやく</button>
+                    <button type="submit" class="btn btn-primary">決定</button>
                 </div>
             </fieldset>
         </form>
-        #{/if}
+        #{/elseif}
     #{/if}
-    #{else}
-    <form class="form-horizontal" action="@{Games.spirit}" method="post">
-        <fieldset>
-            <legend>霊界</legend>
-            <div class="control-group">
-                <label class="control-label" for="body_g_text">本文</label>
 
-                <div class="controls">
-                    <textarea name="text" class="span4" id="body_g_text"></textarea>
-                </div>
-            </div>
-            <div class="form-actions">
-                <input name="villageId" type="hidden" value="${village.villageId}"/>
-                <button type="submit" class="btn btn-primary">うめく</button>
-            </div>
-        </fieldset>
-    </form>
-    #{/else}
-<form class="form-horizontal" action="@{Games.wisper}" method="post">
-    <fieldset>
-        <legend>つぶやき</legend>
-        <div class="control-group">
-            <label class="control-label" for="body_w_text">本文</label>
-
-            <div class="controls">
-                <textarea name="text" class="span4" id="body_w_text"></textarea>
-            </div>
-        </div>
-        <div class="form-actions">
-            <input name="villageId" type="hidden" value="${village.villageId}"/>
-            <button type="submit" class="btn btn-primary">つぶやく</button>
-        </div>
-    </fieldset>
-</form>
-#{/if}
-
-#{if village.state == models.enums.State.Prologue}
-<!-- 入退村 -->
     #{if exist }
-    <form class="form-horizontal" action="@{Games.leave}" method="post">
+    <!-- 発言 -->
+        #{if alive || finished }
+            #{if village.state != models.enums.State.Night}
+            <form class="form-horizontal" action="@{Games.say}" method="post">
+                <fieldset>
+                    <legend>発言</legend>
+                    <div class="control-group">
+                        <label class="control-label" for="body_text">本文</label>
+
+                        <div class="controls">
+                            <textarea name="text" class="span4" id="body_text"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <input name="villageId" type="hidden" value="${village.villageId}"/>
+                        <button type="submit" class="btn btn-primary">発言する</button>
+                    </div>
+                </fieldset>
+            </form>
+            #{/if}
+            #{if closet && village.state == models.enums.State.Night}
+            <form class="form-horizontal" action="@{Games.closet}" method="post">
+                <fieldset>
+                    <legend>秘匿会話</legend>
+                    <div class="control-group">
+                        <label class="control-label" for="body_c_text">本文</label>
+
+                        <div class="controls">
+                            <textarea name="text" class="span4" id="body_c_text"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <input name="villageId" type="hidden" value="${village.villageId}"/>
+                        <button type="submit" class="btn btn-primary">ささやく</button>
+                    </div>
+                </fieldset>
+            </form>
+            #{/if}
+        #{/if}
+        #{else}
+        <form class="form-horizontal" action="@{Games.spirit}" method="post">
+            <fieldset>
+                <legend>霊界</legend>
+                <div class="control-group">
+                    <label class="control-label" for="body_g_text">本文</label>
+
+                    <div class="controls">
+                        <textarea name="text" class="span4" id="body_g_text"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input name="villageId" type="hidden" value="${village.villageId}"/>
+                    <button type="submit" class="btn btn-primary">うめく</button>
+                </div>
+            </fieldset>
+        </form>
+        #{/else}
+    <form class="form-horizontal" action="@{Games.wisper}" method="post">
         <fieldset>
-            <legend>退村</legend>
-            <div class="form-actions">
-                <input name="villageId" type="hidden" value="${village.villageId}"/>
-                <button type="submit" class="btn btn-primary">退村する</button>
-            </div>
-        </fieldset>
-    </form>
-    #{/if}
-    #{elseif session.user_id != null}
-    <form class="form-horizontal" action="@{Games.enter}" method="post">
-        <fieldset>
-            <legend>入村</legend>
+            <legend>つぶやき</legend>
             <div class="control-group">
-                <label class="control-label" for="chara_select">キャラ</label>
+                <label class="control-label" for="body_w_text">本文</label>
 
                 <div class="controls">
-                    <select name="characterId" class="span4" id="chara_select">
-                        #{list items:charas , as:'chara'}
-                            <option value="${chara.characterId}">${chara.name}</option>#{/list}
-                    </select>
+                    <textarea name="text" class="span4" id="body_w_text"></textarea>
                 </div>
             </div>
             <div class="form-actions">
                 <input name="villageId" type="hidden" value="${village.villageId}"/>
-                <button type="submit" class="btn btn-primary">入村する</button>
+                <button type="submit" class="btn btn-primary">つぶやく</button>
             </div>
         </fieldset>
     </form>
-    #{/elseif}
+    #{/if}
+
+    #{if village.state == models.enums.State.Prologue}
+    <!-- 入退村 -->
+        #{if exist }
+        <form class="form-horizontal" action="@{Games.leave}" method="post">
+            <fieldset>
+                <legend>退村</legend>
+                <div class="form-actions">
+                    <input name="villageId" type="hidden" value="${village.villageId}"/>
+                    <button type="submit" class="btn btn-primary">退村する</button>
+                </div>
+            </fieldset>
+        </form>
+        #{/if}
+        #{elseif session.user_id != null}
+        <form class="form-horizontal" action="@{Games.enter}" method="post">
+            <fieldset>
+                <legend>入村</legend>
+                <div class="control-group">
+                    <label class="control-label" for="chara_select">キャラ</label>
+
+                    <div class="controls">
+                        <select name="characterId" class="span4" id="chara_select">
+                            #{list items:charas , as:'chara'}
+                                <option value="${chara.characterId}">${chara.name}</option>#{/list}
+                        </select>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <input name="villageId" type="hidden" value="${village.villageId}"/>
+                    <button type="submit" class="btn btn-primary">入村する</button>
+                </div>
+            </fieldset>
+        </form>
+        #{/elseif}
+    #{/if}
 #{/if}

@@ -222,6 +222,8 @@ public class Village extends GenericModel {
             success = commitToNight(members);
         } else if (state == State.Night) {
             success = commitToDay(members);
+        } else if (force && state == State.Epilogue) {
+            success = toClose();
         }
         return success;
     }
@@ -247,21 +249,34 @@ public class Village extends GenericModel {
         }
         if (wolf == 0) {
             //村勝ち
-            winner = Team.Village;
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
-            state = State.Epilogue;
-            nextCommit = null;
+            toEpilogue(Team.Village);
             return true;
         }
         if (human <= wolf) {
             // 狼勝ち
-            winner = Team.Wolf;
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
-            state = State.Epilogue;
-            nextCommit = null;
-            return true;
+            toEpilogue(Team.Wolf);
         }
         return false;
+    }
+
+    private boolean toEpilogue(Team team) {
+        if (team == null) return false;
+        winner = team;
+        switch (team) {
+            case Wolf:
+                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
+            default:
+                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
+        }
+        state = State.Epilogue;
+        nextCommit = DateTime.now().plusDays(1).toDate();
+        return true;
+    }
+
+    private boolean toClose() {
+        state = State.Closed;
+        nextCommit = null;
+        return save() != null;
     }
 
     /**
