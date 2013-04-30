@@ -186,11 +186,10 @@ public class Village extends GenericModel {
         if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
         Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
         List<String> countMessages = Lists.newArrayList();
-        int villager = (hasDummy()?1:0) + work.get(Skill.Villager).size();
-        if (villager != 0) countMessages.add(Skill.Villager.getLabel() + "が" + villager + "人");
         for (Skill s : Skill.values()) {
-            if (s == Skill.Dummy || s == Skill.Villager) continue;
+            if (s == Skill.Dummy) continue;
             int count = work.get(s).size();
+            if (s == Skill.Villager) count += work.get(Skill.Dummy).size();
             if (count == 0) continue;
             countMessages.add(s.getLabel() + "が" + count + "人");
         }
@@ -199,6 +198,7 @@ public class Village extends GenericModel {
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
         for (Member m : members) {
+            if(m.isDummy())continue;
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()));
         }
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);

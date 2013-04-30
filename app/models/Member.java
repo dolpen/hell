@@ -97,6 +97,12 @@ public class Member extends GenericModel {
         return m.delete();
     }
 
+    /**
+     * @return ダミーなら<code>true</code>
+     */
+    public boolean isDummy() {
+        return user == null;
+    }
 
     // 生存状態の更新、参照系
 

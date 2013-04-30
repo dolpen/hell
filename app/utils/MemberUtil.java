@@ -1,5 +1,6 @@
 package utils;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import models.Member;
 import models.enums.Skill;
@@ -45,32 +46,31 @@ public class MemberUtil {
     public static boolean setSkill(List<Skill> skills, List<Member> members, Long dummyMemberId) {
         if (skills.size() != members.size())
             return false;
-        int l = members.size();
-        // ダミーの探知と役職の設定
 
-        if (dummyMemberId != null) {
-            Skill forDummy = skills.remove(0);
-            if(forDummy!=Skill.Villager)return false;
-            Member dummy = null;
-            for (int i = 0; i < l; i++) {
-                Member m = members.get(i);
-                if (m.memberId.equals(dummyMemberId)) {
-                    dummy = members.remove(i);
-                    break;
-                }
+        // ダミーとプレイヤーの振り分け
+        List<Member> players = Lists.newArrayList();
+        Member dummy = null;
+        for (Member m : members) {
+            if (m.isDummy()) {
+                dummy = m;
+            } else {
+                players.add(m);
             }
-            if (dummy == null)
-                return false;
+        }
+        // ダミーへ役職を振る
+        if (dummy != null) {
+            Skill forDummy = skills.get(0);
+            if (forDummy != Skill.Villager) return false;
             dummy.skill = forDummy;
             dummy.team = forDummy.getInitialTeam();
             dummy.save();
         }
         // 役職の割り振り
-        l = members.size();
+        int l = players.size();
         int[] ind = shuffle(l);
         for (int i = 0; i < l; i++) {
             Member m = members.get(i);
-            m.skill = skills.get(ind[i]);
+            m.skill = skills.get(ind[i] + (dummy == null ? 0 : 1));
             m.team = m.skill.getInitialTeam();
             m.save();
         }
