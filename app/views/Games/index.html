@@ -28,8 +28,9 @@
 
     <tr>
         <td>
-    残り時間 : <span id="time">0</span>
-    </td></tr>
+            残り時間 : <span id="time">0</span>
+        </td>
+    </tr>
 </table>
 
 #{/set}
@@ -78,7 +79,7 @@
 <input type="hidden" id="timeLimit" value="${village.commitTime}"/>
 
 #{if now}
-
+<a name="#form"></a>
     #{if me != null}
     <p>あなた:${me.name}#{if village.state != models.enums.State.Prologue}(${me.skill.label},${me.team.label})#{/if}</p>
         #{if village.state == models.enums.State.Epilogue}
@@ -159,7 +160,6 @@
                     <legend>秘匿会話</legend>
                     <div class="control-group">
                         <label class="control-label" for="body_c_text">本文</label>
-
                         <div class="controls">
                             <textarea name="text" class="span4" id="body_c_text"></textarea>
                         </div>
