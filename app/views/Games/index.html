@@ -4,27 +4,33 @@
     #{script src:'village.js'/}
 #{/set}
 #{set 'navi'}
-<ul class="nav nav-tabs nav-stacked">
+<table class="table">
     #{if village.state == models.enums.State.Epilogue||village.state == models.enums.State.Closed}
         #{list items:members, as:'member'}
-            <li>
-            ${member.name}#{if member.user!=null}(${member.user.name})#{/if}<br/>
-                #{if !member.alive}死亡#{/if}#{else}生存#{/else}
-            </li>
+            <tr>
+                <td>
+                ${member.name}#{if member.user!=null}(${member.user.name})#{/if}<br/>
+                    #{if !member.alive}死亡#{/if}#{else}生存#{/else}
+                </td>
+            </tr>
         #{/list}
     #{/if}
     #{else}
         #{list items:members, as:'member'}
-            <li>
-            ${member.name}<br/>
-                #{if !member.alive}死亡#{/if}#{else}生存#{/else}
-            </li>
+            <tr>
+                <td>
+                ${member.name}<br/>
+                    #{if !member.alive}死亡#{/if}#{else}生存#{/else}
+                </td>
+            </tr>
         #{/list}
     #{/else}
-    <li>
-        残り時間 : <span id="time">0</span>
-    </li>
-</ul>
+
+    <tr>
+        <td>
+    残り時間 : <span id="time">0</span>
+    </td></tr>
+</table>
 
 #{/set}
 <h2>
