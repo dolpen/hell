@@ -1,6 +1,10 @@
 #{extends 'main.html' /} #{set title:'Home' /} #{set 'navi'}
     #{if session.user_id != null}
-    <a href="@{Options.settle}">開村</a>
+    <ul class="nav nav-tabs nav-stacked">
+        <li>
+            <a href="@{Options.settle}">開村</a>
+        </li>
+    </ul>
     #{/if}
 #{/set}
 
@@ -8,8 +12,7 @@
 <h2>地獄</h2>
 <p> --天国のJava再実装は火の海となった。</p>
 <p>
-    人狼がCookieでパスワード送信とかファイルベースのログ管理とかノーフレームワーク&amp;非Rackとかで、<br/>
-    管理が大変だったり怖かったりしたので、<br/>
+    人狼天国がCookieでパスワード送信とかファイルベースのログ管理とかノーフレームワーク&amp;非Rackとかで管理が大変だったり怖かったりしたので、<br/>
     <a href="http://nginx.org/ja/">nginx</a> + <a href="http://www.playframework-ja.org/documentation/1.2.5/home">Play framework 1.x</a> + <a href="http://www-jp.mysql.com/">MySQL</a> で
     パフォーマンスやらセキュリティやらを改善しようとしたものがこれになります。<br/>
     <a href="https://github.com/dolpen/hell">僭越ながらGithubにソースを上げてあるので</a>、攻撃じゃなくてプルリクお願いします。
