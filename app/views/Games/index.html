@@ -79,7 +79,7 @@
 <input type="hidden" id="timeLimit" value="${village.commitTime}"/>
 
 #{if now}
-<a name="#form"></a>
+<a name="form"></a>
     #{if me != null}
     <p>あなた:${me.name}#{if village.state != models.enums.State.Prologue}(${me.skill.label},${me.team.label})#{/if}</p>
         #{if village.state == models.enums.State.Epilogue}
