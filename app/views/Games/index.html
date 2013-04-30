@@ -8,7 +8,7 @@
     #{if village.state == models.enums.State.Epilogue||village.state == models.enums.State.Closed}
         #{list items:members, as:'member'}
             <li>
-            ${member.name}(${member.user.name})<br/>
+            ${member.name}#{if member.user!=null}(${member.user.name})#{/if}<br/>
                 #{if !member.alive}死亡#{/if}#{else}生存#{/else}
             </li>
         #{/list}
