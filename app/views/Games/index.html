@@ -1,4 +1,5 @@
-#{extends 'main.html' /} #{set title:'Home' /}
+#{extends 'main.html' /}
+#{set title}${village.villageId}村 ${village.name}#{/set}
 #{set 'moreScripts'}
     #{script src:'village.js'/}
 #{/set}
@@ -18,9 +19,13 @@
 <h2>
     <i class="icon-cog" style="margin-top: 6px;"></i>${village.villageId}村 ${village.name}
 </h2>
-<p>#{if village.dayCount==1}初日#{/if} #{else}${village.dayCount}
-    日目#{/else} ${village.state.label} #{if village.state == models.enums.State.Prologue}${village.minMember}
-    ～ ${village.maxMember}人参加可能#{/if}</p>
+<p>
+    <a href="@{Games.detail(village.villageId)}">詳細</a>
+#{list items:1..village.dayCount, as:'d'}
+    <a href="@{Games.index(village.villageId,d)}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>&nbsp;
+#{/list}
+#{if village.state == models.enums.State.Prologue}${village.minMember} ～ ${village.maxMember}人参加可能#{/if}
+</p>
 
 
 <table class="table">
@@ -29,12 +34,12 @@
     <tr class="${log.logClass}">
         <td>#{if roar && !closet && !finished}遠吠え#{/if}
             #{elseif log.chara != null}
-            <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61" width="48" /><br />
-        ${log.name}
-        #{/elseif}
-        #{else}
-        ${log.name}
-        #{/else}</td>
+                <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61" width="48"/><br/>
+            ${log.name}
+            #{/elseif}
+            #{else}
+            ${log.name}
+            #{/else}</td>
         <td>#{if roar && !closet && !finished}わおーん#{/if}#{else}${log.body.nl2br()}#{/else}</td>
     </tr>
 #{/list}

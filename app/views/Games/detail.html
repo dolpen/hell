@@ -1,0 +1,26 @@
+#{extends 'main.html' /}
+#{set title}${village.villageId}村 ${village.name}の詳細#{/set}
+
+<table class="table">
+    <tr>
+        <th>村名</th>
+        <td>${village.name}</td>
+    </tr>
+    <tr>
+        <th>編成</th>
+        <td>${village.form}</td>
+    </tr>
+    <tr>
+        <th>ダミー</th>
+        <td>#{if village.dummyMemberId!=null && village.dummyMemberId > 0}あり#{/if}#{else}なし#{/else}</td>
+    </tr>
+    <tr>
+        <th>昼の時間</th>
+        <td>${village.dayTime}分</td>
+    </tr>
+    <tr>
+        <th>夜の時間</th>
+        <td>${village.nightTime}分</td>
+    </tr>
+</table>
+<p><a href="@{Games.index(village.villageId,null)}">もどる</a></p>

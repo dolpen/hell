@@ -3,7 +3,6 @@ package controllers;
 
 import com.google.common.collect.Maps;
 import consts.CookieName;
-import models.Chara;
 import models.*;
 import models.enums.Permission;
 import models.enums.State;
@@ -82,6 +81,16 @@ public class Games extends Controller {
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
         List<Chara> charas = CharacterUtil.getCharacters(village, me);
         render(village, logs, exist, alive, me, members, charas, admin, closet, ability, finished);
+    }
+
+    /**
+     * 村詳細ビュー
+     *
+     * @param villageId 村ID
+     */
+    public static void detail(Long villageId) {
+        Village village = getVillage(villageId);
+        render(village);
     }
 
 
