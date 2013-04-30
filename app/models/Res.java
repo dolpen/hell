@@ -2,10 +2,7 @@ package models;
 
 import com.google.common.base.Objects;
 import consts.Constants;
-import models.enums.Group;
-import models.enums.LogType;
-import models.enums.Permission;
-import models.enums.Skill;
+import models.enums.*;
 import play.db.jpa.Model;
 
 import javax.persistence.CascadeType;
@@ -30,12 +27,27 @@ public class Res extends Model {
     public Skill skill;
     public LogType logType;
 
+    /**
+     * 非ログイン時ビューを返す
+     *
+     * @param village  村
+     * @param dayCount 日数
+     * @return ログ一覧
+     */
     public static List<Res> getPublicResList(Village village, int dayCount) {
         return find(
                 "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by postDate asc",
                 village.villageId, Permission.Public, Permission.Group, Skill.Werewolf, LogType.Say, dayCount).fetch();
     }
 
+    /**
+     * 生存参加時ビューを返す
+     *
+     * @param village  村
+     * @param member   参加者
+     * @param dayCount 日数
+     * @return ログ一覧
+     */
     public static List<Res> getPersonalResList(Village village, Member member, int dayCount) {
         return find(
                 "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission = ?7) and dayCount = ?8 order by postDate asc",
@@ -43,6 +55,14 @@ public class Res extends Model {
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, Permission.Public, dayCount).fetch();
     }
 
+    /**
+     * 霊界参加時ビューを返す
+     *
+     * @param village  村
+     * @param member   参加者
+     * @param dayCount 日数
+     * @return ログ一覧
+     */
     public static List<Res> getDeadPersonalResList(Village village, Member member, int dayCount) {
         return find(
                 "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission in (?7)) and dayCount = ?8 order by postDate asc",
@@ -50,10 +70,23 @@ public class Res extends Model {
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, EnumSet.of(Permission.Public, Permission.Spirit), dayCount).fetch();
     }
 
+    /**
+     * 村終了時向けに全ログを返す
+     *
+     * @param village  村
+     * @param dayCount 日数
+     * @return ログ一覧
+     */
     public static List<Res> getAllResList(Village village, int dayCount) {
         return find("villageId = ?1 and dayCount = ?2 order by postDate asc", village.villageId, dayCount).fetch();
     }
 
+    /**
+     * (View)ログのデータをHTMLに吐くときに出すdom class
+     * ここにgetterがないとViewから参照できないので、unusedになっていても移動や消去をしない。
+     *
+     * @return class
+     */
     public String getLogClass() {
         String res = "";
         if (logType == LogType.Say) { // say
@@ -85,13 +118,26 @@ public class Res extends Model {
     }
 
 
+    /**
+     * 村発言ログの追加
+     *
+     * @param village    村
+     * @param member     発言、閲覧対象の参加者
+     * @param permission 公開範囲
+     * @param body       本文
+     * @return 追加できれば<code>true</code>
+     */
     public static boolean createNewRes(Village village, Member member, Permission permission, String body) {
         if (permission == Permission.Group && member.skill.getGroup() == Group.Dummy) permission = Permission.Personal;
         if (permission != Permission.Spirit && !member.isAlive() && !village.isFinished()) return false;
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;
-        r.name = member.name;
+        if (village.state == State.Epilogue) {
+            r.name = String.format("%s(%s)", member.name, member.user.name);
+        } else {
+            r.name = member.name;
+        }
         r.chara = member.chara;
         r.dayCount = village.dayCount;
         r.postDate = new Date();
@@ -102,6 +148,15 @@ public class Res extends Model {
         return r.save() != null;
     }
 
+    /**
+     * システムメッセージの追加
+     *
+     * @param village    村
+     * @param permission 公開範囲
+     * @param skill      公開対象役職、無ければダミー(全員が閲覧可能)
+     * @param body       本文
+     * @return 追加できれば<code>true</code>
+     */
     public static boolean createNewSystemMessage(Village village, Permission permission, Skill skill, String body) {
         Res r = new Res();
         r.memberId = 0L;
@@ -117,6 +172,16 @@ public class Res extends Model {
         return r.save() != null;
     }
 
+    /**
+     * 個人宛システムメッセージの追加
+     *
+     * @param village    村
+     * @param member     発言、閲覧対象の参加者
+     * @param permission 公開範囲
+     * @param skill      公開対象役職、無ければダミー(全員が閲覧可能)
+     * @param body       本文
+     * @return 追加できれば<code>true</code>
+     */
     public static boolean createNewPersonalMessage(Village village, Member member, Permission permission, Skill skill, String body) {
         Res r = new Res();
         r.memberId = member.memberId;
