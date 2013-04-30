@@ -186,7 +186,7 @@ public class Village extends GenericModel {
         if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
         Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
         List<String> countMessages = Lists.newArrayList();
-        int villager = work.get(Skill.Dummy).size() + work.get(Skill.Villager).size();
+        int villager = (hasDummy()?1:0) + work.get(Skill.Villager).size();
         if (villager != 0) countMessages.add(Skill.Villager.getLabel() + "が" + villager + "人");
         for (Skill s : Skill.values()) {
             if (s == Skill.Dummy || s == Skill.Villager) continue;
