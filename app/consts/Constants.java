@@ -29,13 +29,18 @@ public class Constants {
     public static final String TWILIGHT = "夜になりました。\n村人達は家に鍵をかけ、夜が明けるのを待っています。";
     public static final String WIN_VILLAGER = "すべての人狼を退治しました。\n多くの犠牲の上に、ついに村に平和が訪れました。";
     public static final String WIN_WOLF = "もう人狼に抵抗できるほど村人は残っていません。\n人狼は残った村人をすべて喰らい尽くし、新たな獲物を求めてこの村を去っていきました。";
-
+    public static final String WIN_HAMSTER_V = "すべての人狼を退治しました。\n多くの犠牲を重ね、ついに村に平和が訪れたかのように見えました。\nしかし、村にはまだ妖魔がひっそりと生き残っていました。";
+    public static final String WIN_HAMSTER_W = "もう人狼に抵抗できるほど村人は残っていません。\n生き残った村人もすべて人狼に襲われてしまいました。\nしかし、その人狼もまた村に潜んでいた妖魔によって滅ぼされました。";
+    public static final String WIN_LOVERS = "愛の前ではすべてのものが無力でした。";
 
     public static final Map<Skill, String> ACTION_MESSAGE = ImmutableMap.<Skill, String>builder()
             .put(Skill.Augur, "%s は %s を占います。")
             .put(Skill.Werewolf, "%s は %s を襲撃します。")
             .put(Skill.Hunter, "%s は %s を護衛します。")
+            .put(Skill.Wooer, "%s は %s に求愛します。")
+            .put(Skill.Cupid, "%s は %s と %s に愛の矢を撃ちます。")
             .build();
+
     public static final String FORM_CATTLE = "村狼占狂\n"
             + "村村狼占狂\n"
             + "村村村狼占狂\n"

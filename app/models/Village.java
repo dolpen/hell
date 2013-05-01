@@ -183,7 +183,7 @@ public class Village extends GenericModel {
         if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
         Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
         // 聖痕者のナンバリング
-       if(!MemberUtil.numberingStigmata(work.get(Skill.Stigmata))) return false;
+        if (!MemberUtil.numberingStigmata(work.get(Skill.Stigmata))) return false;
 
 // 内訳発表
         List<String> countMessages = Lists.newArrayList();
@@ -198,8 +198,8 @@ public class Village extends GenericModel {
 // 役職決定
         for (Member m : members) {
             if (m.isDummy()) continue;
-            if(m.skill == Skill.Stigmata){ // 聖痕者は番号含む
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()+m.targetMemberId2));
+            if (m.skill == Skill.Stigmata) { // 聖痕者は番号含む
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel() + m.targetMemberId2));
             } else {
                 Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()));
             }
@@ -258,37 +258,59 @@ public class Village extends GenericModel {
      * @return 決着ついたかどうか
      */
     private boolean endCheck(List<Member> members) {
-        int human = 0;
-        int wolf = 0;
+        int human = 0, wolf = 0;
+        Team sp = null;
+        // カウントと特殊勝利条件の判定
         for (Member m : members) {
-            if (m.isAlive()) {
-                if (m.skill == Skill.Werewolf) {
-                    wolf++;
-                } else {
-                    human++;
-                }
+            if (!m.isAlive()) continue;
+            if (m.skill == Skill.Werewolf) {
+                wolf++;
+            } else {
+                human++;
             }
+            if (m.skill == Skill.Hamster && sp == null) sp = Team.Hamster;
+            if (m.team == Team.Lovers) sp = Team.Lovers;
         }
+        // 勝利条件トリガ
         if (wolf == 0) {
-            toEpilogue(Team.Village);
+            toEpilogue(Team.Village, sp);
             return true;
         } else if (human <= wolf) {
-            toEpilogue(Team.Wolf);
+            toEpilogue(Team.Wolf, sp);
             return true;
         }
         return false;
     }
 
-    private boolean toEpilogue(Team team) {
+    /**
+     * エピローグへのコミット処理
+     *
+     * @param team    勝利条件1
+     * @param special 特殊条件
+     * @return 成功すれば<code>true</code>
+     */
+    private boolean toEpilogue(Team team, Team special) {
         if (team == null) return false;
-        winner = team;
-        switch (team) {
-            case Wolf:
-                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
-                break;
-            default:
-                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
+        if (special == null) { // 通常の決着
+            switch (team) {
+                case Wolf:
+                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
+                    break;
+                default:
+                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
+            }
+        } else if (special == Team.Lovers) { // 恋人
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_LOVERS);
+        } else { // 妖魔
+            switch (team) {
+                case Wolf:
+                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_HAMSTER_W);
+                    break;
+                default:
+                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_HAMSTER_V);
+            }
         }
+        winner = Objects.firstNonNull(special, team);
         state = State.Epilogue;
         nextCommit = DateTime.now().plusDays(1).toDate();
         return true;
