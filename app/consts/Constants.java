@@ -23,10 +23,11 @@ public class Constants {
     public static final String GUARD_ACTION = " %s を護衛しています。";
     public static final String ATTACK_SET = " %s を襲撃します。";
     public static final String ATTACK_FAILED = "今日は犠牲者がいないようだ。人狼は襲撃を失敗したのだろうか。";
-    public static final String ATTACK_ACTION = " %s が無残な姿で発見されました。";
+    public static final String HORRIBLE = " %s が無残な姿で発見されました。";
     public static final String SUICIDE = " %s は %s の後を追って崖から身を投げました。";
     public static final String RANDOM = "（ランダム）";
     public static final String TWILIGHT = "夜になりました。\n村人達は家に鍵をかけ、夜が明けるのを待っています。";
+    public static final String NO_WINNER = "そして誰もいなくなった。";
     public static final String WIN_VILLAGER = "すべての人狼を退治しました。\n多くの犠牲の上に、ついに村に平和が訪れました。";
     public static final String WIN_WOLF = "もう人狼に抵抗できるほど村人は残っていません。\n人狼は残った村人をすべて喰らい尽くし、新たな獲物を求めてこの村を去っていきました。";
     public static final String WIN_HAMSTER_V = "すべての人狼を退治しました。\n多くの犠牲を重ね、ついに村に平和が訪れたかのように見えました。\nしかし、村にはまだ妖魔がひっそりと生き残っていました。";

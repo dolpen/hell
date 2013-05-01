@@ -271,6 +271,11 @@ public class Village extends GenericModel {
             if (m.skill == Skill.Hamster && sp == null) sp = Team.Hamster;
             if (m.team == Team.Lovers) sp = Team.Lovers;
         }
+        // 引き分け
+        if(wolf+human==0){
+            toEpilogue(Team.Others, null);
+            return true;
+        }
         // 勝利条件トリガ
         if (wolf == 0) {
             toEpilogue(Team.Village, sp);
@@ -291,7 +296,9 @@ public class Village extends GenericModel {
      */
     private boolean toEpilogue(Team team, Team special) {
         if (team == null) return false;
-        if (special == null) { // 通常の決着
+        if(team == Team.Others){
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.NO_WINNER);
+        } else if (special == null) { // 通常の決着
             switch (team) {
                 case Wolf:
                     Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
@@ -350,6 +357,8 @@ public class Village extends GenericModel {
         // 処刑メッセージと処刑
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages) + "\n\n" + String.format(Constants.EXECUTION_ACTION, inmate.name));
         inmate.execute();
+        // 恋人連鎖
+        killLovers(members, names, Sets.newHashSet(inmateId));
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
         // 選択された対象のリセット
@@ -382,10 +391,16 @@ public class Village extends GenericModel {
         dayCount++;
         state = State.Day;
         nextCommit = DateTime.now().plusMinutes(dayTime).toDate();
+
+
+        Set<Long> horrible = Sets.newHashSet(); // (理由を問わず)無残各位
+
         // 占い結果
         for (Member m : work.get(Skill.Augur)) {
             Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_ACTION, target.name, target.skill.getAppearance()) + (m.isCommitable() ? "" : Constants.RANDOM));
+            if (target.skill == Skill.Hamster)
+                horrible.add(m.memberId); // 無残入り
         }
         // 護衛
         Set<Long> guardIds = Sets.newHashSet();
@@ -397,14 +412,23 @@ public class Village extends GenericModel {
             }
         }
         // 襲撃/無残メッセージと襲撃
+
         Member victim = names.get(victimId);
         Res.createNewSystemMessage(this, Permission.Group, Skill.Werewolf, String.format(Constants.ATTACK_SET, victim.name));
-        if (guardIds.contains(victimId)) { // GJ
+        if (!guardIds.contains(victimId) && victim.skill.isAttackable())
+            horrible.add(victimId); // 護衛がない&噛める役
+
+        if (horrible.isEmpty()) { // 無残0名
             Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.ATTACK_FAILED);
-        } else { // 護衛失敗
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.ATTACK_ACTION, victim.name));
-            victim.attack();
+        } else { // 無残あり
+            for (Long hid : horrible) {
+                Member h = names.get(hid);
+                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.HORRIBLE, h.name));
+                h.attack();
+            }
         }
+        // 恋人連鎖
+        killLovers(members, names, horrible);
         // 選択された対象のリセット
         CommitUtil.resetTargets(alives);
         endCheck(alives);
@@ -415,21 +439,21 @@ public class Village extends GenericModel {
      * 恋人関係をBFSして自殺させる
      *
      * @param members 死者含む
-     * @param victim  今回死んだ人間
+     * @param names   id->memberのマッピング
+     * @param dead    今回死んだ人間
      */
-    private void killLovers(List<Member> members, Member victim) {
+    private void killLovers(List<Member> members, Map<Long, Member> names, Set<Long> dead) {
         Map<Long, Set<Member>> lovers = CommitUtil.loversGraph(members);
         ArrayDeque<Long> chainQueue = new ArrayDeque<Long>();
-        chainQueue.addLast(victim.memberId);
+        chainQueue.addAll(dead);
         while (!chainQueue.isEmpty()) {
             Long id = chainQueue.pollFirst();
-            for (Member m : lovers.get(id)) {
-                if (m.isAlive()) {
-                    //後追い発生！！！！！！！！
-
-                    m.suicide();
-                    chainQueue.addLast(m.memberId);
-                }
+            Member from = names.get(id);
+            for (Member to : lovers.get(id)) {
+                if (!to.isAlive()) continue;
+                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, from.name, to.name));
+                to.suicide();
+                chainQueue.addLast(to.memberId);
             }
         }
     }
