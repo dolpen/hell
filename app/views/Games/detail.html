@@ -18,12 +18,12 @@
     </div>
     <div class="btn-group">
     #{list items:1..village.dayCount, as:'d'}
-        <a href="@{Games.index(village.villageId,d)}" class="btn">#{if d==1}
+        <a href="@{Games.index(village.villageId,d,null)}" class="btn">#{if d==1}
             初日#{/if}#{else}${d}日目#{/else}</a>
     #{/list}
     </div>
     <div class="btn-group">
-        <a href="@{Games.index(village.villageId,null)}#form" class="btn">最新</a>
+        <a href="@{Games.index(village.villageId,null,null)}#form" class="btn">最新</a>
     </div>
 </div>
 

@@ -66,16 +66,19 @@
     </div>
     <div class="btn-group">
     #{list items:1..village.dayCount, as:'d'}
-        <a href="@{Games.index(village.villageId,d)}" class="btn #{if d==day} active#{/if}">#{if d==1}
+        <a href="@{Games.index(village.villageId,d,null)}" class="btn #{if d==day} active#{/if}">#{if d==1}
             初日#{/if}#{else}${d}日目#{/else}</a>
     #{/list}
     </div>
     <div class="btn-group">
-        <a href="@{Games.index(village.villageId,null)}#form" class="btn">最新</a>
+        <a href="@{Games.index(village.villageId,null,null)}#form" class="btn">最新</a>
     </div>
 </div>
 
 #{set seeroar : finished || (me!=null && me.skill.group == models.enums.Group.Wolf) /}
+
+#{if skipped}<p><a href="@{Games.index(village.villageId, day, true)}">全部見る</a></p>#{/if}
+
 <table class="table">
 #{list items:logs, as:'log'}
     #{set roar : log.permission == models.enums.Permission.Group && (log.skill == models.enums.Skill.Werewolf || log.skill == models.enums.Skill.Crazy ) /}

@@ -24,7 +24,7 @@ public class Options extends Controller {
         if (village == null)
             Application.index();
         if (village.state != State.Prologue)
-            Games.index(village.villageId, null);
+            Games.index(village.villageId, null, null);
         render(village);
     }
 
@@ -33,7 +33,7 @@ public class Options extends Controller {
         if (user == null) Application.index();
         if (validation.hasErrors()) settle();
         Village village = Village.settle(user, name, form, dayTime, nightTime, dummy, 1L);
-        Games.index(village.villageId, null);
+        Games.index(village.villageId, null, null);
     }
 
     public static void updateVillage(@Required Long villageId, @Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy) {
@@ -41,7 +41,7 @@ public class Options extends Controller {
         Village village = Village.findByIdAndAdmin(villageId, getUserId());
         if (village != null && village.state == State.Prologue)
             village.updateVillage(name, form, dayTime, nightTime, dummy);
-        Games.index(villageId, null);
+        Games.index(villageId, null, null);
     }
 
     public static void startVillage(@Required Long villageId) {
@@ -51,7 +51,7 @@ public class Options extends Controller {
         if (village.state == State.Prologue)
             village.start();
 
-        Games.index(village.villageId, null);
+        Games.index(village.villageId, null, null);
     }
 
 }

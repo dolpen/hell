@@ -64,11 +64,12 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param day       日数
      */
-    public static void index(Long villageId, Integer day) {
+    public static void index(Long villageId, Integer day, Boolean all) {
         Village village = getVillage(villageId);
         village.tryCommit();
         User user = tryGetUser();
         if (day == null) day = village.dayCount;
+        if (all == null) all = false;
 
         Member me = getMember(village, user);
         List<Member> members = Member.findByVillage(village);
@@ -79,7 +80,11 @@ public class Games extends Controller {
         boolean ability = exist && me.skill.hasAbility(village.dayCount);
         boolean finished = village.isFinished();
         boolean now = village.dayCount == day && village.state != State.Closed;
-        List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
+        // ログ
+        List<Res> logs = ResUtil.getRes(village, me, day, alive, finished, all?0:50);
+        boolean skipped = !all&&logs.size()>50;
+        if(skipped)logs.remove(0);
+        // ここまでログ
         List<Chara> charas = CharacterUtil.getCharacters(village, me);
         render(village, logs, now, day, exist, alive, me, members, charas, admin, closet, ability, finished);
     }

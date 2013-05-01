@@ -28,7 +28,7 @@
 #{list items:villages, as:'village'}
     <tr>
         <td>${village.villageId}</td>
-        <td><a href="@{Games.index(village.villageId)}">${village.name}</a></td>
+        <td><a href="@{Games.index(village.villageId,null,null)}">${village.name}</a></td>
         <td>${village.state}</td>
     </tr>
 #{/list}
