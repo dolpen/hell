@@ -10,12 +10,12 @@ public enum Skill {
     Augur(2, "占い師", "占", true), // 実装済み
     Mystic(3, "霊能者", "霊", true), // 実装済み
     Hunter(4, "狩人", "狩", true), // 実装済み
-    Freemason(5, "共有", "共", false),
+    Freemason(5, "共有者", "共", true), // 実装済み
     Stigmata(6, "聖痕者", "聖", false), // 番号管理めどいので当分未実装で行きたい
     Werewolf(7, "人狼", "狼", true), // 実装済み
     Insane(8, "狂人", "狂", true), // 実装済み
-    Fanatic(9, "狂信者", "信", false),
-    Crazy(10, "Ｃ国狂人", "Ｃ", false),
+    Fanatic(9, "狂信者", "信", true), // 実装済み
+    Crazy(10, "Ｃ国狂人", "Ｃ", true), // 実装済み
     Hamster(11, "妖魔", "妖", false),
     Cupid(12, "キューピッド", "Ｑ", false),
     Wooer(13, "求愛者", "求", false);
@@ -60,12 +60,16 @@ public enum Skill {
      *
      * @return 夜能力の有無
      */
-    public boolean hasAbility() {
+    public boolean hasAbility(int dayCount) {
         switch (this) {
             case Werewolf:
             case Augur:
-            case Hunter:
                 return true;
+            case Hunter:
+                return dayCount>1;
+            case Cupid:
+            case Wooer:
+                return dayCount==1;
         }
         return false;
     }
@@ -145,6 +149,8 @@ public enum Skill {
      */
     public Group getGroup() {
         switch (this) {
+            case Freemason:
+                return Group.Freemason;
             case Fanatic:
                 return Group.Fanatic;
             case Werewolf:
@@ -165,6 +171,7 @@ public enum Skill {
         switch (this) {
             case Werewolf:
             case Crazy:
+            case Freemason:
                 return true;
         }
         return false;

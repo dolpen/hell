@@ -105,6 +105,16 @@ public class Member extends GenericModel {
         return user == null;
     }
 
+    /**
+     * そのメンバーが指定日に夜能力を持つか
+     *
+     * @param dayCount 日数
+     * @return 持っていれば<code>true</code>
+     */
+    public boolean hasAbility(int dayCount) {
+        return isAlive() && skill.hasAbility(dayCount);
+    }
+
     // 生存状態の更新、参照系
 
     /**
@@ -145,13 +155,23 @@ public class Member extends GenericModel {
         return kill();
     }
 
+
+    /**
+     * 自殺する
+     *
+     * @return 処理が成功すれば<code>true</code>
+     */
+    public boolean suicide() {
+        return kill();
+    }
+
     /**
      * 能力選択、投票の有無
      *
      * @return コミット可能なら<code>true</code>
      */
     public boolean isCommitable() {
-        return targetMemberId > 0L;
+        return !isAlive() || targetMemberId > 0L;
     }
 
     /**

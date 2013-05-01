@@ -76,7 +76,7 @@ public class Games extends Controller {
         boolean alive = exist && me.isAlive();
         boolean admin = village.isYours(user);
         boolean closet = exist && me.skill.hasCloset();
-        boolean ability = exist && me.skill.hasAbility();
+        boolean ability = exist && me.skill.hasAbility(village.dayCount);
         boolean finished = village.isFinished();
         boolean now = village.dayCount == day && village.state != State.Closed;
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);

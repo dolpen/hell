@@ -16,9 +16,10 @@ import java.util.EnumSet;
  */
 public enum Group {
     Dummy(0, EnumSet.of(Skill.Dummy)), // 大体の能力者はこれ
-    Wolf(1, EnumSet.of(Skill.Werewolf, Skill.Crazy, Skill.Fanatic)), // このグループに紐づく役職は(狼会話まで見られる)狼とC狂がこれにあたる
-    Fanatic(1, EnumSet.of(Skill.Fanatic)), // このグループに紐づく役職は(狼リスト=狂信者用メッセージ)が見られる。狂信者専用
-    Mystic(2, EnumSet.of(Skill.Mystic)); // 判定は霊能全員が見えなければならない
+    Freemason(1, EnumSet.of(Skill.Freemason)),// このグループに紐づく役職は共有会話が見られる。共有者専用
+    Wolf(2, EnumSet.of(Skill.Werewolf, Skill.Crazy, Skill.Fanatic)), // このグループに紐づく役職は(狼会話まで見られる)狼とC狂がこれにあたる
+    Fanatic(3, EnumSet.of(Skill.Fanatic)), // このグループに紐づく役職は(狼リスト=狂信者用メッセージ)が見られる。狂信者専用
+    Mystic(4, EnumSet.of(Skill.Mystic)); // 判定は霊能全員が見えなければならない
 
     private int value;
 

@@ -69,7 +69,7 @@ public class MemberUtil {
         int l = players.size();
         int[] ind = shuffle(l);
         for (int i = 0; i < l; i++) {
-            Member m = members.get(i);
+            Member m = players.get(i);
             m.skill = skills.get(ind[i] + (dummy == null ? 0 : 1));
             m.team = m.skill.getInitialTeam();
             m.save();
