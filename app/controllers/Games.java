@@ -1,6 +1,7 @@
 package controllers;
 
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import consts.CookieName;
 import models.*;
@@ -81,9 +82,9 @@ public class Games extends Controller {
         boolean finished = village.isFinished();
         boolean now = village.dayCount == day && village.state != State.Closed;
         // ログ
-        List<Res> logs = ResUtil.getRes(village, me, day, alive, finished, all?0:50);
-        boolean skipped = !all&&logs.size()>50;
-        if(skipped)logs.remove(0);
+        List<Res> logs = ResUtil.getRes(village, me, day, alive, finished, all ? 0 : 50);
+        boolean skipped = !all && logs.size() > 50;
+        if (skipped) logs.remove(0);
         // ここまでログ
         List<Chara> charas = CharacterUtil.getCharacters(village, me);
         render(village, logs, now, day, exist, alive, me, members, charas, admin, closet, ability, finished);
@@ -121,6 +122,9 @@ public class Games extends Controller {
     }
 
     public static void say(Long villageId, String text) {
+        if (Strings.isNullOrEmpty(text)) {
+            redirectToVillage(villageId);
+        }
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
@@ -132,6 +136,9 @@ public class Games extends Controller {
     }
 
     public static void wisper(Long villageId, String text) {
+        if (Strings.isNullOrEmpty(text)) {
+            redirectToVillage(villageId);
+        }
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
@@ -142,6 +149,9 @@ public class Games extends Controller {
     }
 
     public static void spirit(Long villageId, String text) {
+        if (Strings.isNullOrEmpty(text)) {
+            redirectToVillage(villageId);
+        }
         Village village = getVillage(villageId);
         User user = tryGetUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
@@ -152,6 +162,9 @@ public class Games extends Controller {
     }
 
     public static void closet(Long villageId, String text) {
+        if (Strings.isNullOrEmpty(text)) {
+            redirectToVillage(villageId);
+        }
         Village village = getVillage(villageId);
         User user = getUser();
         if (user == null || !village.exist(user) || village.state == State.Closed) {
