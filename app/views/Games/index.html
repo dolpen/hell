@@ -43,12 +43,14 @@
             <a href="@{Options.update(village.villageId)}">村情報の更新</a>
         </li>
         <li>
-            <fieldset>
-                <div class="form-actions">
-                    <input name="villageId" type="hidden" value="${village.villageId}"/>
-                    <button type="submit" class="btn btn-primary">開始</button>
-                </div>
-            </fieldset>
+            <form class="form-horizontal" action="@{Options.startVillage}" method="post">
+                <fieldset>
+                    <div class="form-actions">
+                        <input name="villageId" type="hidden" value="${village.villageId}"/>
+                        <button type="submit" class="btn btn-primary">開始</button>
+                    </div>
+                </fieldset>
+            </form>
         </li>
     </ul>
     #{/if}
@@ -63,9 +65,10 @@
         <a href="@{Games.detail(village.villageId)}" class="btn">詳細</a>
     </div>
     <div class="btn-group">
-        #{list items:1..village.dayCount, as:'d'}
-            <a href="@{Games.index(village.villageId,d)}" class="btn #{if d==day} active#{/if}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>
-        #{/list}
+    #{list items:1..village.dayCount, as:'d'}
+        <a href="@{Games.index(village.villageId,d)}" class="btn #{if d==day} active#{/if}">#{if d==1}
+            初日#{/if}#{else}${d}日目#{/else}</a>
+    #{/list}
     </div>
 </div>
 
@@ -74,16 +77,27 @@
 #{list items:logs, as:'log'}
     #{set roar : log.permission == models.enums.Permission.Group && (log.skill == models.enums.Skill.Werewolf || log.skill == models.enums.Skill.Crazy ) /}
     <tr class="${log.logClass}">
-        <td>#{if roar && !seeroar }遠吠え#{/if}
-            #{elseif log.chara != null}
-                <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61"
-                     width="48"/><br/>
-            ${log.name}
-            #{/elseif}
-            #{else}
-            ${log.name}
-            #{/else}</td>
-        <td>#{if roar && !seeroar }わおーん#{/if}#{else}${log.body.nl2br()}#{/else}</td>
+        #{if log.logType == models.enums.LogType.System}
+            <td colspan="2">${log.body.nl2br()}</td>
+        #{/if}
+        #{else}
+            <td>
+                #{if roar && !seeroar }<img src="/public/images/${log.chara.party.dir}/howl.png" height="61"
+                                            width="48"/>#{/if}
+                #{elseif log.chara != null}
+                    <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61"
+                         width="48"/>
+                #{/elseif}
+            </td>
+            <td>
+                #{if !roar || seeroar}
+                    <p><span class="character">${log.name}</span>&nbsp;<span class="time">${log.postDate}</span></p>
+                #{/if}
+                <div>
+                    #{if roar && !seeroar }わおーん#{/if}#{else}${log.body.nl2br()}#{/else}
+                </div>
+            </td>
+        #{/else}
     </tr>
 #{/list}
 </table>

@@ -10,6 +10,7 @@ import models.enums.Skill;
 import models.enums.State;
 import models.enums.Team;
 import org.joda.time.DateTime;
+import play.Logger;
 import play.db.jpa.GenericModel;
 import utils.CommitUtil;
 import utils.MemberUtil;
@@ -242,8 +243,10 @@ public class Village extends GenericModel {
         boolean success = false;
         if (state == State.Day) {
             success = commitToNight(members);
+            if(!success)  Logger.error("commitToDay failed!!!!!!!!!!!!!!!!!!!!!!!!");
         } else if (state == State.Night) {
             success = commitToDay(members);
+            if(!success)  Logger.error("commitToNight failed!!!!!!!!!!!!!!!!!!!!!!!!");
         } else if (force && state == State.Epilogue) {
             success = toClose();
         }
@@ -358,7 +361,7 @@ public class Village extends GenericModel {
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages) + "\n\n" + String.format(Constants.EXECUTION_ACTION, inmate.name));
         inmate.execute();
         // 恋人連鎖
-        killLovers(members, names, Sets.newHashSet(inmateId));
+        //killLovers(members, names, Sets.newHashSet(inmateId));
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
         // 選択された対象のリセット
@@ -428,7 +431,7 @@ public class Village extends GenericModel {
             }
         }
         // 恋人連鎖
-        killLovers(members, names, horrible);
+        //killLovers(members, names, horrible);
         // 選択された対象のリセット
         CommitUtil.resetTargets(alives);
         endCheck(alives);

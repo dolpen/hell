@@ -1,9 +1,18 @@
+.character {
+    font-size: small;
+}
+
+.time {
+    color: #444444;
+    font-size: x-small;
+}
 
 /* ログの種別 */
 
 .log_system {
     border-left: 10px solid #888800;
 }
+
 .log_say {
     border-left: 10px solid #dddddd;
 }
@@ -11,30 +20,35 @@
 .log_wisper {
     background: #888888;
 }
-.log_spirit {
-    background : #8888ff;
-}
 
+.log_spirit {
+    background: #8888ff;
+}
 
 /* ログパーミッションの種別 */
 .pm_dummy {
 }
 
-.pm_werewolf,.pm_insane,.pm_fanatic,.pm_crazy {
+.pm_werewolf, .pm_insane, .pm_fanatic, .pm_crazy {
     background: #ff8888;
 }
+
 .pm_augur {
     background: #dd88ff;
 }
+
 .pm_mystic {
-     background: #aaaaff;
- }
-.pm_freemason,.pm_hunter,.pm_stigmata,.pm_villager{
+    background: #aaaaff;
+}
+
+.pm_freemason, .pm_hunter, .pm_stigmata, .pm_villager {
     background: #aaffaa;
 }
-.pm_hamster{
+
+.pm_hamster {
     background: #ffff99;
 }
-.pm_upid,.pm_wooer{
+
+.pm_upid, .pm_wooer {
     background: #ff88ff;
 }

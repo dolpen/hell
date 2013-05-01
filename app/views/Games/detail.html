@@ -8,12 +8,23 @@
     </li>
 </ul>
 #{/set}
+<h2>
+    <i class="icon-cog" style="margin-top: 6px;"></i>${village.villageId}村 ${village.name}
+</h2>
+#{if village.state == models.enums.State.Prologue}<p>${village.minMember} ～ ${village.maxMember}人参加可能</p>#{/if}
+<div class="btn-toolbar">
+    <div class="btn-group">
+        <a href="@{Games.detail(village.villageId)}" class="btn active">詳細</a>
+    </div>
+    <div class="btn-group">
+    #{list items:1..village.dayCount, as:'d'}
+        <a href="@{Games.index(village.villageId,d)}" class="btn">#{if d==1}
+            初日#{/if}#{else}${d}日目#{/else}</a>
+    #{/list}
+    </div>
+</div>
 
 <table class="table">
-    <tr>
-        <th>村名</th>
-        <td>${village.name}</td>
-    </tr>
     <tr>
         <th>編成</th>
         <td>${village.form.nl2br()}</td>
