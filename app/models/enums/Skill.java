@@ -5,13 +5,13 @@ package models.enums;
  */
 public enum Skill {
 
-    Dummy(0, "ダミー", "ダ", false),
+    Dummy(0, "ダミー", "ダ", false), // 概念なのでこのまま
     Villager(1, "村人", "村", true), // 実装済み
     Augur(2, "占い師", "占", true), // 実装済み
     Mystic(3, "霊能者", "霊", true), // 実装済み
     Hunter(4, "狩人", "狩", true), // 実装済み
     Freemason(5, "共有者", "共", true), // 実装済み
-    Stigmata(6, "聖痕者", "聖", false), // 番号管理めどいので当分未実装で行きたい
+    Stigmata(6, "聖痕者", "聖", true), // 実装済み
     Werewolf(7, "人狼", "狼", true), // 実装済み
     Insane(8, "狂人", "狂", true), // 実装済み
     Fanatic(9, "狂信者", "信", true), // 実装済み

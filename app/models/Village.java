@@ -182,6 +182,9 @@ public class Village extends GenericModel {
         List<Member> members = Member.findByVillage(this);
         if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
         Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
+        // 聖痕者のナンバリング
+       if(!MemberUtil.numberingStigmata(work.get(Skill.Stigmata))) return false;
+
 // 内訳発表
         List<String> countMessages = Lists.newArrayList();
         for (Skill s : Skill.values()) {
@@ -195,7 +198,11 @@ public class Village extends GenericModel {
 // 役職決定
         for (Member m : members) {
             if (m.isDummy()) continue;
-            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()));
+            if(m.skill == Skill.Stigmata){ // 聖痕者は番号含む
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()+m.targetMemberId2));
+            } else {
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()));
+            }
         }
 // 仲間発表：狼(狂信者、C狂、狼に見える)
         countMessages.clear();

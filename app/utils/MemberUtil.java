@@ -78,6 +78,23 @@ public class MemberUtil {
     }
 
     /**
+     * 聖痕者にナンバリングする
+     * @param stigmas 聖痕者
+     * @return 成功すれば<code>true</code>
+     */
+    public static boolean numberingStigmata(Set<Member> stigmas){
+        if(stigmas == null || stigmas.isEmpty())return true;
+        int l = stigmas.size();
+        int[] ind = shuffle(l);
+        int i = 0;
+        for(Member m : stigmas){
+            if(m.skill!=Skill.Stigmata)return false;
+            m.targetMemberId2 = Integer.valueOf(ind[i]+1).longValue();
+        }
+        return true;
+    }
+
+    /**
      * 順番シャッフル
      *
      * @param n 人数

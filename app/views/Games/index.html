@@ -64,7 +64,7 @@
     </div>
     <div class="btn-group">
         #{list items:1..village.dayCount, as:'d'}
-            <a href="@{Games.index(village.villageId,d)}" class="btn#{if d==day} active#{/if}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>
+            <a href="@{Games.index(village.villageId,d)}" class="btn #{if d==day} active#{/if}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>
         #{/list}
     </div>
 </div>
