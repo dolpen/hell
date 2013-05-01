@@ -70,6 +70,9 @@
             初日#{/if}#{else}${d}日目#{/else}</a>
     #{/list}
     </div>
+    <div class="btn-group">
+        <a href="@{Games.index(village.villageId,null)}#form" class="btn">最新</a>
+    </div>
 </div>
 
 #{set seeroar : finished || (me!=null && me.skill.group == models.enums.Group.Wolf) /}

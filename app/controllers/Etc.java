@@ -51,6 +51,7 @@ public class Etc extends Controller {
             Chara.makeNewCharacter(p, in, s);
             in++;
         }
+        Application.index();
     }
 
 
