@@ -70,7 +70,6 @@ public class CommitUtil {
      */
     public static Long getElected(Set<Long> allMemberIds, Map<Long, Integer> votes) {
         Set<Long> candidates = Sets.newHashSet(allMemberIds);
-        //System.out.println("candidates : " + Arrays.deepToString(candidates.toArray()));
         int max = 0;
         for (Long memberId : votes.keySet()) {
             int num = votes.get(memberId);

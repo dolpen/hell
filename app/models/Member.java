@@ -186,6 +186,16 @@ public class Member extends GenericModel {
         targetMemberId3 = tgt2;
         return validateAndSave();
     }
+    /**
+     * 能力や投票の対象を選ぶ
+     *
+     * @param tgt 目標
+     * @return 処理が成功すれば<code>true</code>
+     */
+    public boolean setTarget(Long tgt) {
+        targetMemberId = tgt;
+        return validateAndSave();
+    }
 
     /**
      * 投票する
@@ -194,7 +204,7 @@ public class Member extends GenericModel {
      * @return 処理が成功すれば<code>true</code>
      */
     public boolean vote(Long target) {
-        return setTarget(target, null);
+        return setTarget(target);
     }
 
     /**
@@ -203,7 +213,7 @@ public class Member extends GenericModel {
      * @return 処理が成功すれば<code>true</code>
      */
     public boolean resetTarget() {
-        return setTarget(-1L, -1L);
+        return setTarget(-1L);
     }
 
 }
