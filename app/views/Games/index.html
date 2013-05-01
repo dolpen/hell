@@ -1,5 +1,5 @@
 #{extends 'main.html' /}
-#{set title}${village.villageId}村 ${village.name}#{/set}
+#{set title : village.villageId + '村 '+village.name /}
 #{set 'moreScripts'}
     #{script src:'village.js'/}
 #{/set}
@@ -10,7 +10,7 @@
             <tr>
                 <td>
                 ${member.name}#{if member.user!=null}(${member.user.name})#{/if}<br/>
-                    #{if !member.alive}死亡#{/if}#{else}生存#{/else}
+                ${member.skill.label} #{if !member.alive}死亡#{/if}#{else}生存#{/else}
                 </td>
             </tr>
         #{/list}
@@ -33,18 +33,41 @@
     </tr>
 </table>
 
+
+
+
+    #{if admin && village.state == models.enums.State.Prologue}
+    <!-- 管理 -->
+    <ul class="nav nav-tabs nav-stacked">
+        <li>
+            <a href="@{Options.update(village.villageId)}">村情報の更新</a>
+        </li>
+        <li>
+            <fieldset>
+                <div class="form-actions">
+                    <input name="villageId" type="hidden" value="${village.villageId}"/>
+                    <button type="submit" class="btn btn-primary">開始</button>
+                </div>
+            </fieldset>
+        </li>
+    </ul>
+    #{/if}
+
 #{/set}
 <h2>
     <i class="icon-cog" style="margin-top: 6px;"></i>${village.villageId}村 ${village.name}
 </h2>
-<p>
-    <a href="@{Games.detail(village.villageId)}">詳細</a>
-#{list items:1..village.dayCount, as:'d'}
-    <a href="@{Games.index(village.villageId,d)}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>&nbsp;
-#{/list}
-#{if village.state == models.enums.State.Prologue}${village.minMember} ～ ${village.maxMember}人参加可能#{/if}
-</p>
-
+#{if village.state == models.enums.State.Prologue}<p>${village.minMember} ～ ${village.maxMember}人参加可能</p>#{/if}
+<div class="btn-toolbar">
+    <div class="btn-group">
+        <a href="@{Games.detail(village.villageId)}" class="btn">詳細</a>
+    </div>
+    <div class="btn-group">
+        #{list items:1..village.dayCount, as:'d'}
+            <a href="@{Games.index(village.villageId,d)}" class="btn#{if d==day} active#{/if}">#{if d==1}初日#{/if}#{else}${d}日目#{/else}</a>
+        #{/list}
+    </div>
+</div>
 
 #{set seeroar : finished || (me!=null && me.skill.group == models.enums.Group.Wolf) /}
 <table class="table">
@@ -53,7 +76,8 @@
     <tr class="${log.logClass}">
         <td>#{if roar && !seeroar }遠吠え#{/if}
             #{elseif log.chara != null}
-                <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61" width="48"/><br/>
+                <img src="/public/images/${log.chara.party.dir}/${log.chara.characterId}.png" height="61"
+                     width="48"/><br/>
             ${log.name}
             #{/elseif}
             #{else}
@@ -64,18 +88,6 @@
 #{/list}
 </table>
 
-#{if admin && village.state == models.enums.State.Prologue}
-<!-- 管理 -->
-<p><a href="@{Options.update(village.villageId)}">村情報の更新</a></p>
-<form class="form-horizontal" action="@{Options.startVillage}" method="post">
-    <fieldset>
-        <div class="form-actions">
-            <input name="villageId" type="hidden" value="${village.villageId}"/>
-            <button type="submit" class="btn btn-primary">開始</button>
-        </div>
-    </fieldset>
-</form>
-#{/if}
 
 <input type="hidden" id="timeLimit" value="${village.commitTime}"/>
 
@@ -161,6 +173,7 @@
                     <legend>秘匿会話</legend>
                     <div class="control-group">
                         <label class="control-label" for="body_c_text">本文</label>
+
                         <div class="controls">
                             <textarea name="text" class="span4" id="body_c_text"></textarea>
                         </div>

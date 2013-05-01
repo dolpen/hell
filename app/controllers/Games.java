@@ -81,7 +81,7 @@ public class Games extends Controller {
         boolean now = village.dayCount == day && village.state != State.Closed;
         List<Res> logs = ResUtil.getRes(village, me, day, alive, finished);
         List<Chara> charas = CharacterUtil.getCharacters(village, me);
-        render(village, logs, now, exist, alive, me, members, charas, admin, closet, ability, finished);
+        render(village, logs, now, day, exist, alive, me, members, charas, admin, closet, ability, finished);
     }
 
     /**

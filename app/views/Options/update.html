@@ -1,5 +1,13 @@
 #{extends 'main.html' /}
-#{set title:'Home' /}
+#{set title:'村の情報を更新する' /}
+
+#{set 'navi'}
+<ul class="nav nav-tabs nav-stacked">
+    <li>
+        <a href="@{Games.index(village.villageId,null)}">もどる</a>
+    </li>
+</ul>
+#{/set}
 
 <form class="form-horizontal form-stacked" action="@{Options.updateVillage}" method="post">
     <fieldset>

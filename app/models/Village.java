@@ -265,8 +265,7 @@ public class Village extends GenericModel {
         if (wolf == 0) {
             toEpilogue(Team.Village);
             return true;
-        }
-        if (human <= wolf) {
+        } else if (human <= wolf) {
             toEpilogue(Team.Wolf);
             return true;
         }
@@ -279,6 +278,7 @@ public class Village extends GenericModel {
         switch (team) {
             case Wolf:
                 Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
+                break;
             default:
                 Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
         }

@@ -1,6 +1,12 @@
 #{extends 'main.html' /}
-#{set title:'Home' /}
-
+#{set title:'開村する' /}
+#{set 'navi'}
+<ul class="nav nav-tabs nav-stacked">
+    <li>
+        <a href="@{Application.index()}">トップ</a>
+    </li>
+</ul>
+#{/set}
 <form class="form-horizontal form-stacked" action="@{Options.settleVillage}" method="post">
     <fieldset>
         <legend>登録</legend>

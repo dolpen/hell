@@ -1,5 +1,13 @@
 #{extends 'main.html' /}
-#{set title}${village.villageId}村 ${village.name}の詳細#{/set}
+#{set title : village.villageId + '村 '+village.name+'の詳細' /}
+
+#{set 'navi'}
+<ul class="nav nav-tabs nav-stacked">
+    <li>
+        <a href="@{Games.index(village.villageId,null)}">もどる</a>
+    </li>
+</ul>
+#{/set}
 
 <table class="table">
     <tr>
@@ -23,4 +31,3 @@
         <td>${village.nightTime}分</td>
     </tr>
 </table>
-<p><a href="@{Games.index(village.villageId,null)}">もどる</a></p>
