@@ -24,8 +24,9 @@ public class Member extends GenericModel {
     @ManyToOne(cascade = CascadeType.DETACH)
     public Chara chara; // 使用キャラ
     public Skill skill = Skill.Villager; // 所持能力
-    public Long targetMemberId = 0L; // 能力行使対象
-    public Long targetMemberId2 = 0L; // 能力行使対象
+    public Long targetMemberId = 0L; // 投票/・能力行使対象
+    public Long targetMemberId2 = 0L; // 能力行使対象(恋向け)
+    public Long targetMemberId3 = 0L; // 能力行使対象(恋向け)
     public Team team = Team.Village; // 所属陣営(恋すると書き換わる)
     public boolean alive = true;
 
@@ -161,8 +162,8 @@ public class Member extends GenericModel {
      * @return 処理が成功すれば<code>true</code>
      */
     public boolean setTarget(Long tgt1, Long tgt2) {
-        targetMemberId = tgt1;
-        targetMemberId2 = tgt2;
+        targetMemberId2 = tgt1;
+        targetMemberId3 = tgt2;
         return validateAndSave();
     }
 

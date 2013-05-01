@@ -16,10 +16,7 @@ import utils.MemberUtil;
 import utils.SkillUtils;
 
 import javax.persistence.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity(name = "village")
 public class Village extends GenericModel {
@@ -198,7 +195,7 @@ public class Village extends GenericModel {
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
         for (Member m : members) {
-            if(m.isDummy())continue;
+            if (m.isDummy()) continue;
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.skill.getLabel()));
         }
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);
@@ -242,6 +239,8 @@ public class Village extends GenericModel {
     private boolean endCheck(List<Member> members) {
         int human = 0;
         int wolf = 0;
+        int lovers = 0;
+        int hams = 0;
         for (Member m : members) {
             if (m.isAlive()) {
                 if (m.skill == Skill.Werewolf) {
@@ -249,16 +248,34 @@ public class Village extends GenericModel {
                 } else {
                     human++;
                 }
+
+                if (m.team == Team.Lovers) {
+                    lovers++;
+                } else if(m.team == Team.Hamster){
+                    hams++;
+                }
             }
         }
         if (wolf == 0) {
-            //村勝ち
-            toEpilogue(Team.Village);
+            if (lovers > 0) {
+                toEpilogue(Team.Village);
+            } else if(hams > 0){
+                toEpilogue(Team.Village);
+            } else{
+                toEpilogue(Team.Village);
+            }
             return true;
         }
         if (human <= wolf) {
-            // 狼勝ち
-            toEpilogue(Team.Wolf);
+
+            if (lovers > 0) {
+                toEpilogue(Team.Wolf);
+            } else if(hams > 0){
+                toEpilogue(Team.Wolf);
+            } else {
+                toEpilogue(Team.Wolf);
+            }
+            return true;
         }
         return false;
     }
@@ -290,18 +307,23 @@ public class Village extends GenericModel {
      */
     private boolean commitToNight(List<Member> members) {
         if (state != State.Day) return false;
+
+        List<Member> alives = Lists.newArrayList();
+        for (Member m : members)
+            if (m.isAlive()) alives.add(m);
+
         // 投票の集計
-        Map<Long, Member> names = MemberUtil.memberMap(members); // id -> object
+        Map<Long, Member> names = MemberUtil.memberMap(alives); // id -> object
         Set<Long> memberIds = names.keySet();
 
         // 処刑
         List<String> voteMessages = Lists.newArrayList();
-        for (Member m : members) {
+        for (Member m : alives) {
             Long id = m.isCommitable() ? m.targetMemberId : CommitUtil.randomMemberId(memberIds, m.memberId);
             voteMessages.add(String.format(Constants.VOTE_ACTION, m.name, names.get(id).name) + (m.isCommitable() ? "" : Constants.RANDOM));
             m.targetMemberId = id;
         }
-        Map<Long, Integer> votes = CommitUtil.vote(Sets.newHashSet(members), memberIds, false); // id -> 票数
+        Map<Long, Integer> votes = CommitUtil.vote(Sets.newHashSet(alives), memberIds, false); // id -> 票数
         //for (Long memberId : votes.keySet()) Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VOTE_COUNT, names.get(memberId).name, votes.get(memberId)));
         // 処刑対象の決定
         Long inmateId = CommitUtil.getElected(memberIds, votes);
@@ -312,8 +334,8 @@ public class Village extends GenericModel {
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
         // 選択された対象のリセット
-        CommitUtil.resetTargets(members);
-        if (!endCheck(members)) {
+        CommitUtil.resetTargets(alives);
+        if (!endCheck(alives)) {
             // 無事なら続行
             state = State.Night;
             nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
@@ -329,8 +351,13 @@ public class Village extends GenericModel {
      */
     private boolean commitToDay(List<Member> members) {
         if (state != State.Night) return false;
-        Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
-        Map<Long, Member> names = MemberUtil.memberMap(members); // id -> object
+
+        List<Member> alives = Lists.newArrayList();
+        for (Member m : members)
+            if (m.isAlive()) alives.add(m);
+
+        Map<Skill, Set<Member>> work = MemberUtil.skillMembers(alives);
+        Map<Long, Member> names = MemberUtil.memberMap(alives); // id -> object
         // 狼：襲撃先の選定
         Long victimId = CommitUtil.processAttack(work.get(Skill.Werewolf), names.keySet(), dummyMemberId, dayCount);
         // 夜明け
@@ -361,9 +388,31 @@ public class Village extends GenericModel {
             victim.attack();
         }
         // 選択された対象のリセット
-        CommitUtil.resetTargets(members);
-        endCheck(members);
+        CommitUtil.resetTargets(alives);
+        endCheck(alives);
         return save() != null;
+    }
+
+    /**
+     * 恋人関係をBFSして自殺させる
+     *
+     * @param members 死者含む
+     * @param victim  今回死んだ人間
+     */
+    private void killLovers(List<Member> members, Member victim) {
+        Map<Long, Set<Member>> lovers = CommitUtil.loversGraph(members);
+        ArrayDeque<Long> chainQueue = new ArrayDeque<Long>();
+        chainQueue.addLast(victim.memberId);
+        while (!chainQueue.isEmpty()) {
+            Long id = chainQueue.pollFirst();
+            for (Member m : lovers.get(id)) {
+                if (m.isAlive()) {
+                    //後追い発生！！！！！！！！
+                    m.execute();
+                    chainQueue.addLast(m.memberId);
+                }
+            }
+        }
     }
 
     // ユーザーの行動

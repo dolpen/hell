@@ -5,13 +5,37 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import models.Member;
+import models.enums.Skill;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 public class CommitUtil {
+
+    /**
+     * 恋人後追いグラフを作ります
+     *
+     * @param members 生存者
+     * @return map
+     */
+    public static Map<Long, Set<Member>> loversGraph(List<Member> members) {
+        Map<Long, Member> memberIdMap = Maps.newHashMap();
+        Map<Long, Set<Member>> ret = Maps.newHashMap();
+        for (Member m : members) {
+            memberIdMap.put(m.memberId, m);
+            ret.put(m.memberId, new HashSet<Member>());
+        }
+        // id -> loversの双方向マップ
+        for (Member m : members) {
+            if (m.skill == Skill.Cupid && m.targetMemberId2 != null) { // QP・2人指名
+                ret.get(m.targetMemberId2).add(memberIdMap.get(m.targetMemberId3));
+                ret.get(m.targetMemberId3).add(memberIdMap.get(m.targetMemberId2));
+            } else if (m.skill == Skill.Wooer && m.targetMemberId2 != null) { // 求愛・1人指名
+                ret.get(m.targetMemberId2).add(memberIdMap.get(m.memberId));
+                ret.get(m.memberId).add(memberIdMap.get(m.targetMemberId2));
+            }
+        }
+        return ret;
+    }
 
     /**
      * 対象メンバーで投票した時の、MemberID -> 票数のマッピングを得る
