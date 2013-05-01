@@ -243,10 +243,10 @@ public class Village extends GenericModel {
         boolean success = false;
         if (state == State.Day) {
             success = commitToNight(members);
-            if(!success)  Logger.error("commitToDay failed!!!!!!!!!!!!!!!!!!!!!!!!");
+            if (!success) Logger.error("commitToDay failed!!!!!!!!!!!!!!!!!!!!!!!!");
         } else if (state == State.Night) {
             success = commitToDay(members);
-            if(!success)  Logger.error("commitToNight failed!!!!!!!!!!!!!!!!!!!!!!!!");
+            if (!success) Logger.error("commitToNight failed!!!!!!!!!!!!!!!!!!!!!!!!");
         } else if (force && state == State.Epilogue) {
             success = toClose();
         }
@@ -275,7 +275,7 @@ public class Village extends GenericModel {
             if (m.team == Team.Lovers) sp = Team.Lovers;
         }
         // 引き分け
-        if(wolf+human==0){
+        if (wolf + human == 0) {
             toEpilogue(Team.Others, null);
             return true;
         }
@@ -299,7 +299,7 @@ public class Village extends GenericModel {
      */
     private boolean toEpilogue(Team team, Team special) {
         if (team == null) return false;
-        if(team == Team.Others){
+        if (team == Team.Others) {
             Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.NO_WINNER);
         } else if (special == null) { // 通常の決着
             switch (team) {
@@ -357,6 +357,8 @@ public class Village extends GenericModel {
         // 処刑対象の決定
         Long inmateId = CommitUtil.getElected(memberIds, votes);
         Member inmate = names.get(inmateId);
+        if (inmate == null)
+            Logger.error("not found inmate : " + inmateId + " alive : " + Arrays.deepToString(alives.toArray()));
         // 処刑メッセージと処刑
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages) + "\n\n" + String.format(Constants.EXECUTION_ACTION, inmate.name));
         inmate.execute();
@@ -417,6 +419,8 @@ public class Village extends GenericModel {
         // 襲撃/無残メッセージと襲撃
 
         Member victim = names.get(victimId);
+        if (victim == null)
+            Logger.error("not found victim : " + victimId + " alive : " + Arrays.deepToString(alives.toArray()));
         Res.createNewSystemMessage(this, Permission.Group, Skill.Werewolf, String.format(Constants.ATTACK_SET, victim.name));
         if (!guardIds.contains(victimId) && victim.skill.isAttackable())
             horrible.add(victimId); // 護衛がない&噛める役
