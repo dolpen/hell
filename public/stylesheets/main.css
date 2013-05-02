@@ -4,10 +4,11 @@
     padding: 9px 0;
     position: fixed;
     top: 60px;
+    width : 280px;
 }
 
 .row-fluid > .span-fixed-sidebar {
-    margin-left: 290px;
+    margin-left: 340px;
 }
 
 .left-navigation {
@@ -15,6 +16,7 @@
     padding-bottom: 20px;
     overflow: auto;
 }
+
 
 .character {
     font-size: small;
