@@ -216,8 +216,12 @@ public class Village extends GenericModel {
         for (Member m : work.get(Skill.Freemason)) {
             countMessages.add(m.name);
         }
-        if (!countMessages.isEmpty())
+        if (countMessages.size()==1){
+            Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON_SINGLE, countMessages.get(0)));
+        } else if(!countMessages.isEmpty()){
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON, Joiner.on("、").join(countMessages)));
+
+        }
 // 日暮れ
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();

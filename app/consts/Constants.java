@@ -14,6 +14,7 @@ public class Constants {
     public static final String SKILL_SET = "%s の役職が %s に決定しました。";
     public static final String SKILL_WOLF = "この村に潜む人狼は、%sです。";
     public static final String SKILL_FREEMASON = "%sは心を共有しています。";
+    public static final String SKILL_FREEMASON_SINGLE = "%s は凄い共有者です。凄すぎて相方はいません。";
     public static final String VOTE_SET = "%s は %s に投票します。";
     public static final String VOTE_ACTION = "%s は %s に投票しました。";
     //public static final String VOTE_COUNTS = "%s に、 %d 人投票しました。";
