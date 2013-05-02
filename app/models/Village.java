@@ -505,6 +505,20 @@ public class Village extends GenericModel {
     }
 
     /**
+     * ユーザーのキック
+     *
+     * @param adminId 管理者
+     * @return メンバー
+     */
+    public Member kick(Long adminId,Long memberId) {
+        if (!canLeave()||adminId==null||!userId.equals(adminId)) return null;
+        Member m = Member.findByIds(this,memberId);
+        if (m == null) return null;
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VILLAGE_LEAVE, m.name));
+        return m.delete();
+    }
+
+    /**
      * ユーザーの存在確認
      *
      * @param user ユーザー

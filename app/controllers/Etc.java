@@ -37,6 +37,7 @@ public class Etc extends Controller {
     };
 
     public static void reset() {
+        if(Village.count()>0)notFound();
         Village.deleteAll();
         Member.deleteAll();
         Res.deleteAll();

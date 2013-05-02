@@ -64,14 +64,15 @@ public class Games extends Controller {
      *
      * @param villageId 村ID
      * @param day       日数
+     * @param all       ログ全件閲覧フラグ
      */
     public static void index(Long villageId, Integer day, Boolean all) {
         Village village = getVillage(villageId);
         village.tryCommit();
         User user = tryGetUser();
         if (day == null) day = village.dayCount;
+        if (day > village.dayCount) notFound();
         if (all == null) all = false;
-
         Member me = getMember(village, user);
         List<Member> members = Member.findByVillage(village);
         boolean exist = me != null;
@@ -101,7 +102,13 @@ public class Games extends Controller {
     }
 
 
-    // 夜能力の行使
+    /**
+     * 夜能力の更新
+     *
+     * @param villageId 村ID
+     * @param firstId   対象1
+     * @param secondId  対象2
+     */
     public static void target(Long villageId, Long firstId, Long secondId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -111,7 +118,12 @@ public class Games extends Controller {
         redirectToVillage(villageId);
     }
 
-    // 投票
+    /**
+     * 投票
+     *
+     * @param villageId 村ID
+     * @param firstId   投票先参加者ID
+     */
     public static void vote(Long villageId, Long firstId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -121,6 +133,12 @@ public class Games extends Controller {
         redirectToVillage(villageId);
     }
 
+    /**
+     * 公開発言
+     *
+     * @param villageId 村ID
+     * @param text      内容
+     */
     public static void say(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
@@ -135,6 +153,12 @@ public class Games extends Controller {
         redirectToVillage(villageId);
     }
 
+    /**
+     * 非公開発言
+     *
+     * @param villageId 村ID
+     * @param text      内容
+     */
     public static void wisper(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
@@ -148,6 +172,12 @@ public class Games extends Controller {
         redirectToVillage(villageId);
     }
 
+    /**
+     * 霊界発言
+     *
+     * @param villageId 村ID
+     * @param text      内容
+     */
     public static void spirit(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);

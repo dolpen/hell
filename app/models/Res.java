@@ -35,7 +35,7 @@ public class Res extends Model {
      * @return ログ一覧
      */
     public static List<Res> getPublicResList(Village village, int dayCount, int limit) {
-        if (limit > 0)return find(
+        if (limit > 0) return find(
                 "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by postDate desc",
                 village.villageId, Permission.Public, Permission.Group, Skill.Werewolf, LogType.Say, dayCount).fetch(limit);
         return find(
@@ -142,7 +142,13 @@ public class Res extends Model {
      */
     public static boolean createNewRes(Village village, Member member, Permission permission, String body) {
         if (permission == Permission.Group && member.skill.getGroup() == Group.Dummy) permission = Permission.Personal;
-        if (permission != Permission.Spirit && !member.isAlive() && !village.isFinished()) return false;
+        if (village.isRunning()) {
+            // 生存状態と異なるパーミッションでの発言は出来ない
+            if ((permission == Permission.Spirit) == member.isAlive()) permission = Permission.Personal;
+        } else {
+            // 開始前と決着後は霊界発言不可能
+            if (permission == Permission.Spirit) permission = Permission.Personal;
+        }
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;

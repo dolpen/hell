@@ -6,10 +6,33 @@ import play.mvc.Controller;
 
 public class Accounts extends Controller {
 
+    /**
+     * ユーザー登録ページ
+     */
     public static void index() {
         render();
     }
 
+    /**
+     * ユーザー登録
+     *
+     * @param name 名前
+     * @param pass パスワード
+     */
+    public static void regist(String name, String pass) {
+        if (User.get(name, pass) != null) {
+            render();
+        }
+        User.createNewUser(name, pass);
+        login(name, pass);
+    }
+
+    /**
+     * ログイン
+     *
+     * @param name 名前
+     * @param pass パスワード
+     */
     public static void login(String name, String pass) {
         User user = User.get(name, pass);
         if (user != null) {
@@ -20,17 +43,13 @@ public class Accounts extends Controller {
         Application.index();
     }
 
+    /**
+     * ログアウト
+     */
     public static void logout() {
         session.remove(CookieName.USER_ID);
         Application.index();
     }
 
-    public static void regist(String name, String pass) {
-        if (User.get(name, pass) != null) {
-            render();
-        }
-        User.createNewUser(name, pass);
-        login(name, pass);
-    }
 
 }
