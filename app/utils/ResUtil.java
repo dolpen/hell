@@ -13,8 +13,8 @@ import java.util.List;
 public class ResUtil {
 
     public static List<Res> getRes(Village village, Member me, int day, boolean alive, boolean finished, int limit) {
-        List<Res> logs = getResList(village, me, day, alive, finished, limit + 1);
-        Collections.reverse(logs);
+        List<Res> logs = getResList(village, me, day, alive, finished, limit == 0 ? 0 : (limit + 1));
+        if(limit>0)Collections.reverse(logs);
         return logs;
     }
 
