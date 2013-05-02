@@ -1,9 +1,18 @@
 $(function () {
     var limit = $('#timeLimit').val();
-    if (limit == "0"){
+    $('#start').submit(function() {
+        if (confirm("村を手動開始しますか？")) {
+            return true;
+        }
+        return false;
+    });
+    if (limit == null || limit == "" || limit == "0"){
         $('#time').text('-');
         return;
     }
+    var pad = function(n){
+        return ("00"+n).slice(-2);
+    };
     var f = function () {
         var time = Math.floor((limit - new Date()) / 1000);
         var resp = '';
@@ -12,15 +21,16 @@ $(function () {
             time %= 60;
         }
         if (time >= 60 || resp.length > 0) {
-            resp += Math.floor(time / 60) + '分';
+            resp += pad(Math.floor(time / 60)) + '分';
             time %= 60;
         }
         if (time >= 0) {
-            $('#time').text(resp + time + '秒');
+            $('#time').text(resp + pad(time) + '秒');
             setTimeout(f, 1000);
         } else {
             $('#time').text('更新してください');
         }
     };
     f();
+
 });

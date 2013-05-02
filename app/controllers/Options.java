@@ -1,10 +1,14 @@
 package controllers;
 
+import consts.Constants;
 import models.User;
 import models.Village;
 import models.enums.State;
+import play.data.binding.As;
 import play.data.validation.Required;
 import play.mvc.Controller;
+
+import java.util.Date;
 
 import static controllers.Application.getUser;
 import static controllers.Application.getUserId;
@@ -28,11 +32,13 @@ public class Options extends Controller {
      * @param nightTime 夜の時間
      * @param dummy     ダミー有無
      */
-    public static void settleVillage(@Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy) {
+    public static void settleVillage(@Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy, @As(Constants.DATETIME_PICKER) Date time) {
         User user = getUser();
         if (user == null) Application.index();
-        if (validation.hasErrors()) settle();
-        Village village = Village.settle(user, name, form, dayTime, nightTime, dummy, 1L);
+        if (validation.hasErrors() && !(validation.errorsMap().keySet().size() == 1 && validation.errorsMap().keySet().contains("time"))) {
+            settle();
+        }
+        Village village = Village.settle(user, name, form, dayTime, nightTime, dummy, 1L, time);
         Games.index(village.villageId, null, null);
     }
 
@@ -61,12 +67,16 @@ public class Options extends Controller {
      * @param dayTime   昼の時間
      * @param nightTime 夜の時間
      * @param dummy     ダミー有無
+     * @param time      開始予定時刻
      */
-    public static void updateVillage(@Required Long villageId, @Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy) {
-        if (validation.hasErrors()) update(villageId);
+    public static void updateVillage(@Required Long villageId, @Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy, @As(Constants.DATETIME_PICKER) Date time) {
+        if (validation.hasErrors() && !(validation.errorsMap().keySet().size() == 1 && validation.errorsMap().keySet().contains("time"))) {
+            if(villageId!=null)update(villageId);
+            Application.index();
+        }
         Village village = Village.findByIdAndAdmin(villageId, getUserId());
         if (village != null && village.state == State.Prologue)
-            village.updateVillage(name, form, dayTime, nightTime, dummy);
+            village.updateVillage(name, form, dayTime, nightTime, dummy, time);
         Games.index(villageId, null, null);
     }
 

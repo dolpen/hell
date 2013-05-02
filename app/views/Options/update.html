@@ -1,6 +1,18 @@
 #{extends 'main.html' /}
 #{set title:'村の情報を更新する' /}
-
+#{set 'moreScripts'}
+    #{script src:'bootstrap-datetimepicker.min.js'/}
+<script type="text/javascript">
+    $(function () {
+        $('#datetime').datetimepicker({
+            language: 'ja-JP'
+        });
+    });
+</script>
+#{/set}
+#{set 'moreStyles'}
+    #{stylesheet src:'bootstrap-datetimepicker.min.css'/}
+#{/set}
 #{set 'navi'}
 <ul class="nav nav-tabs nav-stacked">
     <li>
@@ -16,6 +28,18 @@
             <label class="control-label" for="name_text">村名</label>
             <div class="controls">
                 <input type="text" name="name" class="xlarge" id="name_text" value="${village.name}">
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="datetime">自動開始日時</label>
+            <div class="controls">
+                <div id="datetime" class="input-append date">
+                    <input name="time" data-format="yyyy/MM/dd hh:mm:ss" type="text"/>
+                    <span class="add-on">
+                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                    </span>
+                </div>
+                <span class="help-block">変更しない場合は空欄に、設定されている自動開始日時を解除して手動で開始する場合は過去の日時を指定してください</span>
             </div>
         </div>
         <div class="control-group">

@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>#{get 'title' /} - hell α</title>
-    <meta charset="${_response_encoding}">
-    <link rel="stylesheet" href="@{'/public/stylesheets/main.css'}">
-    <link rel="stylesheet" href="/public/stylesheets/bootstrap.min.css">
+<title>#{get 'title' /} - hell α</title>
+<meta charset="${_response_encoding}" />
+#{stylesheet src:'main.css'/}
+#{stylesheet src:'bootstrap.min.css'/}
 #{get 'moreStyles' /}
-    <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-    <script src="@{'/public/javascripts/jquery-1.9.1.min.js'}" type="text/javascript"
-            charset="${_response_encoding}"></script>
-    <script src="@{'/public/javascripts/bootstrap.min.js'}"></script>
-    <script src="@{'/public/javascripts/main.js'}"></script>
+<link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}" />
+#{script src:'jquery-1.9.1.min.js'/}
+#{script src:'bootstrap.min.js'/}
+#{script src:'main.js'/}
 #{get 'moreScripts' /}
 </head>
 <body>

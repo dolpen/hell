@@ -6,6 +6,8 @@ import models.enums.Skill;
 import java.util.Map;
 
 public class Constants {
+
+    public static final String DATETIME_PICKER = "yyyy/MM/dd HH:mm:ss";
     public static final String SYSTEM_NAME = "天の声";
     public static final String VILLAGE_SETTLE = "人狼、それは人のふりをすることができる伝説の狼。\nその人狼がこの村に紛れ込んでいるという噂がどこからともなく広がりました。\n村人達は半信半疑ながらも、集会所に集まって話し合いをすることにしました。";
     public static final String VILLAGE_ENTER = "%s が集会場にやってきました。";

@@ -66,9 +66,11 @@ public class Village extends GenericModel {
      * @param dayTime   昼間時間
      * @param nightTime 夜時間
      * @param dummy     ダミーを含むかどうか
+     * @param partyId   キャラセットID
+     * @param time      開始予定時刻
      * @return 立った村
      */
-    public static Village settle(User user, String name, String form, int dayTime, int nightTime, boolean dummy, Long partyId) {
+    public static Village settle(User user, String name, String form, int dayTime, int nightTime, boolean dummy, Long partyId, Date time) {
         Village v = new Village();
         v.userId = user.userId;
         v.name = name;
@@ -77,6 +79,13 @@ public class Village extends GenericModel {
         v.nightTime = nightTime;
         v.partyId = partyId;
         if (!v.parseOption()) return null;
+        if (time != null) {
+            if (time.after(new Date(System.currentTimeMillis()))) {
+                v.nextCommit = time;
+            } else {
+                v.nextCommit = null;
+            }
+        }
         v = v.save();
         if (v == null) return null;
         // 人狼、それは
@@ -86,6 +95,7 @@ public class Village extends GenericModel {
             v.enterDummy();
             v = v.save();
         }
+
         return v;
     }
 
@@ -97,9 +107,10 @@ public class Village extends GenericModel {
      * @param dayTime   昼間時間
      * @param nightTime 夜時間
      * @param dummy     ダミーを含むかどうか
+     * @param time      開始予定時刻
      * @return 更新された村
      */
-    public Village updateVillage(String name, String form, int dayTime, int nightTime, boolean dummy) {
+    public Village updateVillage(String name, String form, int dayTime, int nightTime, boolean dummy, Date time) {
         this.name = name;
         this.form = form;
         this.dayTime = dayTime;
@@ -110,6 +121,13 @@ public class Village extends GenericModel {
             enterDummy();
         } else {
             leaveDummy();
+        }
+        if (time != null) {
+            if (time.after(new Date(System.currentTimeMillis()))) {
+                this.nextCommit = time;
+            } else {
+                this.nextCommit = null;
+            }
         }
         return save();
     }
@@ -216,9 +234,9 @@ public class Village extends GenericModel {
         for (Member m : work.get(Skill.Freemason)) {
             countMessages.add(m.name);
         }
-        if (countMessages.size()==1){
+        if (countMessages.size() == 1) {
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON_SINGLE, countMessages.get(0)));
-        } else if(!countMessages.isEmpty()){
+        } else if (!countMessages.isEmpty()) {
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON, Joiner.on("、").join(countMessages)));
 
         }
@@ -237,8 +255,16 @@ public class Village extends GenericModel {
      * @return 成功すれば<code>true</code>
      */
     public boolean tryCommit() {
-        if (!isRunning()) return false;
         boolean force = nextCommit != null && nextCommit.before(new Date(System.currentTimeMillis()));
+        if (state == State.Prologue) {
+            if(!force)return false;
+            boolean success = start();
+            if (!success) {
+                nextCommit = null;
+                save();
+            }
+            return success;
+        }
         List<Member> members = Member.findByVillage(this);
         if (!force) {
             for (Member m : members) {
@@ -510,9 +536,9 @@ public class Village extends GenericModel {
      * @param adminId 管理者
      * @return メンバー
      */
-    public Member kick(Long adminId,Long memberId) {
-        if (!canLeave()||adminId==null||!userId.equals(adminId)) return null;
-        Member m = Member.findByIds(this,memberId);
+    public Member kick(Long adminId, Long memberId) {
+        if (!canLeave() || adminId == null || !userId.equals(adminId)) return null;
+        Member m = Member.findByIds(this, memberId);
         if (m == null) return null;
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VILLAGE_LEAVE, m.name));
         return m.delete();

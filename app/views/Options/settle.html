@@ -1,5 +1,18 @@
 #{extends 'main.html' /}
 #{set title:'開村する' /}
+#{set 'moreScripts'}
+    #{script src:'bootstrap-datetimepicker.min.js'/}
+<script type="text/javascript">
+    $(function () {
+        $('#datetime').datetimepicker({
+            language: 'ja-JP'
+        });
+    });
+</script>
+#{/set}
+#{set 'moreStyles'}
+    #{stylesheet src:'bootstrap-datetimepicker.min.css'/}
+#{/set}
 #{set 'navi'}
 <ul class="nav nav-tabs nav-stacked">
     <li>
@@ -12,18 +25,35 @@
         <legend>登録</legend>
         <div class="control-group">
             <label class="control-label" for="name_text">村名</label>
+
             <div class="controls">
                 <input type="text" name="name" class="xlarge" id="name_text" value="村">
             </div>
         </div>
+
+        <div class="control-group">
+            <label class="control-label" for="datetime">自動開始日時</label>
+            <div class="controls">
+                <div id="datetime" class="input-append date">
+                    <input name="time" data-format="yyyy/MM/dd hh:mm:ss" type="text"/>
+                    <span class="add-on">
+                        <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
+                    </span>
+                </div>
+                <span class="help-block">自動開始しない場合は空欄にしてください</span>
+            </div>
+
+        </div>
         <div class="control-group">
             <label class="control-label" for="form_text">編成</label>
+
             <div class="controls">
                 <textarea name="form" class="span8" id="form_text">${consts.Constants.FORM_CATTLE}</textarea>
             </div>
         </div>
         <div class="control-group">
             <label class="control-label" for="dummy_check">ダミー</label>
+
             <div class="controls">
                 <input type="radio" name="dummy" class="xlarge" value="true" checked>あり
                 <input type="radio" name="dummy" class="xlarge" value="false">なし
@@ -31,16 +61,19 @@
         </div>
         <div class="control-group">
             <label class="control-label" for="day_text">昼の時間</label>
+
             <div class="controls">
                 <input type="text" name="dayTime" class="xlarge" id="day_text" value="5">分
             </div>
         </div>
         <div class="control-group">
             <label class="control-label" for="night_text">夜の時間</label>
+
             <div class="controls">
                 <input type="text" name="nightTime" class="xlarge" id="night_text" value="3">分
             </div>
         </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-primary">登録する</button>
         </div>

@@ -5,7 +5,18 @@
 #{/set}
 #{set 'navi'}
 
+<table class="table">
+    #{if village.state == models.enums.State.Prologue}
+        <tr><td>
+            #{if village.nextCommit != null}自動開始 : ${village.nextCommit}#{/if}
+            #{else}手動開始#{/else}
+        </td></tr>
+    #{/if}
+    <tr><td>残り時間 : <span id="time">0</span></td></tr>
+</table>
+
 <div id="accordion-members" class="accordion-group">
+
     <div class="accordion-heading">
         <a class="accordion-toggle" data-toggle="collapse" data-target="#members">参加者</a>
     </div>
@@ -34,7 +45,6 @@
         </table>
     </div>
 </div>
-<p>残り時間 : <span id="time">0</span></p>
 
     #{if admin && village.state == models.enums.State.Prologue}
     <!-- 管理 -->
@@ -43,7 +53,7 @@
             <a href="@{Options.update(village.villageId)}">村情報の更新</a>
         </li>
         <li>
-            <form class="form-horizontal" action="@{Options.startVillage}" method="post">
+            <form id="start" class="form-horizontal" action="@{Options.startVillage}" method="post">
                 <fieldset>
                     <div class="form-actions">
                         <input name="villageId" type="hidden" value="${village.villageId}"/>
