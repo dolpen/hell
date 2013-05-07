@@ -8,16 +8,13 @@ import models.enums.Skill;
 import models.enums.State;
 import play.db.jpa.Model;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
 @Entity(name = "res")
 public class Res extends Model {
-
     public Long memberId;
     public Long villageId;
     @ManyToOne(cascade = CascadeType.DETACH)
@@ -39,10 +36,10 @@ public class Res extends Model {
      */
     public static List<Res> getPublicResList(Village village, int dayCount, int limit) {
         if (limit > 0) return find(
-                "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by postDate desc",
+                "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by id desc",
                 village.villageId, Permission.Public, Permission.Group, Skill.Werewolf, LogType.Say, dayCount).fetch(limit);
         return find(
-                "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by postDate asc",
+                "villageId = ?1 and (permission = ?2 or (permission = ?3 and skill = ?4 and logType = ?5)) and dayCount = ?6 order by id asc",
                 village.villageId, Permission.Public, Permission.Group, Skill.Werewolf, LogType.Say, dayCount).fetch();
     }
 
@@ -56,11 +53,11 @@ public class Res extends Model {
      */
     public static List<Res> getPersonalResList(Village village, Member member, int dayCount, int limit) {
         if (limit > 0) return find(
-                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission = ?7) and dayCount = ?8 order by postDate desc",
+                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission = ?7) and dayCount = ?8 order by id desc",
                 village.villageId, member.memberId, Permission.Group,
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, Permission.Public, dayCount).fetch(limit);
         return find(
-                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission = ?7) and dayCount = ?8 order by postDate asc",
+                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission = ?7) and dayCount = ?8 order by id asc",
                 village.villageId, member.memberId, Permission.Group,
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, Permission.Public, dayCount).fetch();
     }
@@ -75,11 +72,11 @@ public class Res extends Model {
      */
     public static List<Res> getDeadPersonalResList(Village village, Member member, int dayCount, int limit) {
         if (limit > 0) return find(
-                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission in (?7)) and dayCount = ?8 order by postDate desc",
+                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission in (?7)) and dayCount = ?8 order by id desc",
                 village.villageId, member.memberId, Permission.Group,
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, EnumSet.of(Permission.Public, Permission.Spirit), dayCount).fetch(limit);
         return find(
-                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission in (?7)) and dayCount = ?8 order by postDate asc",
+                "villageId = ?1 and (memberId = ?2 or (permission = ?3 and skill in (?4)) or (permission = ?3 and skill = ?5 and logType = ?6) or permission in (?7)) and dayCount = ?8 order by id asc",
                 village.villageId, member.memberId, Permission.Group,
                 member.skill.getGroup().getSkills(), Skill.Werewolf, LogType.Say, EnumSet.of(Permission.Public, Permission.Spirit), dayCount).fetch();
     }
@@ -93,8 +90,8 @@ public class Res extends Model {
      */
     public static List<Res> getAllResList(Village village, int dayCount, int limit) {
         if (limit > 0)
-            return find("villageId = ?1 and dayCount = ?2 order by postDate desc", village.villageId, dayCount).fetch(limit);
-        return find("villageId = ?1 and dayCount = ?2 order by postDate asc", village.villageId, dayCount).fetch();
+            return find("villageId = ?1 and dayCount = ?2 order by id desc", village.villageId, dayCount).fetch(limit);
+        return find("villageId = ?1 and dayCount = ?2 order by id asc", village.villageId, dayCount).fetch();
     }
 
     /**
