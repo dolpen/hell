@@ -7,12 +7,16 @@
 
 <table class="table">
     #{if village.state == models.enums.State.Prologue}
-        <tr><td>
-            #{if village.nextCommit != null}自動開始 : ${village.nextCommit}#{/if}
-            #{else}手動開始#{/else}
-        </td></tr>
+        <tr>
+            <td>
+                #{if village.nextCommit != null}自動開始 : ${village.nextCommit}#{/if}
+                #{else}手動開始#{/else}
+            </td>
+        </tr>
     #{/if}
-    <tr><td>残り時間 : <span id="time">0</span></td></tr>
+    <tr>
+        <td>残り時間 : <span id="time">0</span></td>
+    </tr>
 </table>
 
 <div id="accordion-members" class="accordion-group">
@@ -146,6 +150,18 @@
                         </select>
                     </div>
                 </div>
+                #{if me.skill == models.enums.Skill.Cupid}
+                    <div class="control-group">
+                        <label class="control-label" for="target2_select">対象</label>
+
+                        <div class="controls">
+                            <select name="secondId" id="target2_select">
+                                #{list items:members, as:'member'}#{if member.alive && member.memberId != me.memberId}
+                                    <option value="${member.memberId}">${member.name}</option>#{/if}#{/list}
+                            </select>
+                        </div>
+                    </div>
+                #{/if}
                 <div class="form-actions">
                     <input name="villageId" type="hidden" value="${village.villageId}"/>
                     <button type="submit" class="btn btn-primary">決定</button>

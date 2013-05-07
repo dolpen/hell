@@ -17,8 +17,8 @@ public enum Skill {
     Fanatic(9, "狂信者", "信", true), // 実装済み
     Crazy(10, "Ｃ国狂人", "Ｃ", true), // 実装済み
     Hamster(11, "妖魔", "妖", true), // 実装済み
-    Cupid(12, "キューピッド", "Ｑ", false),
-    Wooer(13, "求愛者", "求", false);
+    Cupid(12, "キューピッド", "Ｑ", true),
+    Wooer(13, "求愛者", "求", true);
 
     private int value;
 

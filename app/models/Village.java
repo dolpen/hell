@@ -237,7 +237,6 @@ public class Village extends GenericModel {
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON_SINGLE, countMessages.get(0)));
         } else if (!countMessages.isEmpty()) {
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON, Joiner.on("、").join(countMessages)));
-
         }
 // 日暮れ
         state = State.Night;
@@ -256,7 +255,7 @@ public class Village extends GenericModel {
     public boolean tryCommit() {
         boolean force = nextCommit != null && nextCommit.before(new Date(System.currentTimeMillis()));
         if (state == State.Prologue) {
-            if(!force)return false;
+            if (!force) return false;
             boolean success = start();
             if (!success) {
                 nextCommit = null;
@@ -387,15 +386,17 @@ public class Village extends GenericModel {
         // 処刑対象の決定
         Long inmateId = CommitUtils.getElected(memberIds, votes);
         Member inmate = names.get(inmateId);
-        if (inmate == null)
+        if (inmate == null) {
             Logger.error("not found inmate : " + inmateId + " alive : " + Arrays.deepToString(alives.toArray()));
-        // 処刑メッセージと処刑
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages) + "\n\n" + String.format(Constants.EXECUTION_ACTION, inmate.name));
-        inmate.execute();
+        } else {
+            // 処刑メッセージと処刑
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Joiner.on("\n").join(voteMessages) + "\n\n" + String.format(Constants.EXECUTION_ACTION, inmate.name));
+            inmate.execute();
+            // 霊メッセージ
+            Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
+        }
         // 恋人連鎖
-        //killLovers(members, names, Sets.newHashSet(inmateId));
-        // 霊メッセージ
-        Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
+        killLovers(members, names, Sets.newHashSet(inmateId));
         // 選択された対象のリセット
         CommitUtils.resetTargets(alives);
         if (!endCheck(alives)) {
@@ -427,6 +428,44 @@ public class Village extends GenericModel {
         state = State.Day;
         nextCommit = DateTime.now().plusMinutes(dayTime).toDate();
 
+        // 恋関連処理
+
+        if (Skill.Cupid.hasAbility(dayCount - 1)) {
+            for (Member m : work.get(Skill.Cupid)) {
+                boolean random = false;
+                if (m.targetMemberId2 <= 0L) {
+                    random = true;
+                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId3));
+                }
+                if (m.targetMemberId3 <= 0L) {
+                    random = true;
+                    m.targetMemberId3 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId2));
+                }
+                Member first = names.get(m.targetMemberId2);
+                Member second = names.get(m.targetMemberId3);
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Cupid), m.name, first.name, second.name) + (random ? Constants.RANDOM : ""));
+                first.team = second.team = Team.Lovers;
+            }
+            for (Member m : work.get(Skill.Wooer)) {
+                boolean random = false;
+                if (m.targetMemberId2 <= 0L) {
+                    random = true;
+                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.memberId));
+                }
+                if (m.targetMemberId3 <= 0L) m.targetMemberId3 = m.memberId;
+                Member first = names.get(m.targetMemberId3);
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, first.name) + (random ? Constants.RANDOM : ""));
+                first.team = Team.Lovers;
+            }
+            Map<Long, Set<Member>> lovers = CommitUtils.loversGraph(members);
+            for (Long id : lovers.keySet()) {
+                Member m = names.get(id);
+                for (Member l : lovers.get(id)) {
+                    Res.createNewPersonalMessage(this, m, Permission.Personal, Skill.Cupid, String.format(Constants.FALL_IN_LOVE, m.name, l.name));
+                }
+            }
+        }
+
 
         Set<Long> horrible = Sets.newHashSet(); // (理由を問わず)無残各位
 
@@ -443,7 +482,7 @@ public class Village extends GenericModel {
             for (Member m : work.get(Skill.Hunter)) {
                 Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId)));
                 guardIds.add(target.memberId);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.GUARD_ACTION, target.name) + (m.isCommitable() ? "" : Constants.RANDOM));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Hunter), target.name) + (m.isCommitable() ? "" : Constants.RANDOM));
             }
         }
         // 襲撃/無残メッセージと襲撃
@@ -451,7 +490,7 @@ public class Village extends GenericModel {
         Member victim = names.get(victimId);
         if (victim == null)
             Logger.error("not found victim : " + victimId + " alive : " + Arrays.deepToString(alives.toArray()));
-        Res.createNewSystemMessage(this, Permission.Group, Skill.Werewolf, String.format(Constants.ATTACK_SET, victim.name));
+        Res.createNewSystemMessage(this, Permission.Group, Skill.Werewolf, String.format(Constants.ACTION_MESSAGE.get(Skill.Werewolf), victim.name));
         if (!guardIds.contains(victimId) && victim.skill.isAttackable())
             horrible.add(victimId); // 護衛がない&噛める役
 
@@ -465,7 +504,7 @@ public class Village extends GenericModel {
             }
         }
         // 恋人連鎖
-        //killLovers(members, names, horrible);
+        killLovers(members, names, horrible);
         // 選択された対象のリセット
         CommitUtils.resetTargets(alives);
         endCheck(alives);
@@ -488,7 +527,7 @@ public class Village extends GenericModel {
             Member from = names.get(id);
             for (Member to : lovers.get(id)) {
                 if (!to.isAlive()) continue;
-                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, from.name, to.name));
+                Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, to.name, from.name));
                 to.suicide();
                 chainQueue.addLast(to.memberId);
             }
@@ -570,22 +609,28 @@ public class Village extends GenericModel {
         if (me == null || first == null || !me.isAlive() || !first.isAlive()) {
             return false;
         }
-        me.targetMemberId = first.memberId;
-        if (secondId != null) {
-            Member second = Member.findByIds(this, secondId);
-            if (second != null && second.isAlive())
-                me.targetMemberId2 = second.memberId;
-            // if (state == State.Night)  // message cupid;
-        } else {
-            if (state == State.Day) {
-                // 投票内容
-                Res.createNewPersonalMessage(this, me, Permission.Personal, Skill.Dummy, String.format(Constants.VOTE_SET, me.name, first.name));
-            } else {
-                // 能力の行使内容
-                Res.createNewPersonalMessage(this, me, Permission.Personal, me.skill, String.format(Constants.ACTION_MESSAGE.get(me.skill), me.name, first.name));
-            }
-        }
 
+        // 昼は投票
+        if (state == State.Day) {
+            me.setTarget(firstId);
+            Res.createNewPersonalMessage(this, me, Permission.Personal, Skill.Dummy, String.format(Constants.VOTE_SET, me.name, first.name));
+            return me.save() != null;
+        }
+        // 夜の役職指定系
+        if (!me.hasAbility(dayCount)) return false;
+        if (me.skill == Skill.Cupid) {// 2人を指定しなければならず、対象を永続化するタイプの役職
+            if (secondId == null || secondId.equals(firstId)) return false;
+            Member second = Member.findByIds(this, secondId);
+            if (second == null || !second.isAlive()) return false;
+            me.setTarget(firstId, secondId);
+            Res.createNewPersonalMessage(this, me, Permission.Personal, me.skill, String.format(Constants.ACTION_SELECT.get(Skill.Cupid), me.name, first.name, second.name));
+        } else if (me.skill == Skill.Wooer) {// 1人を指定しなければならず、対象を永続化するタイプの役職
+            me.setTarget(firstId, me.memberId);
+            Res.createNewPersonalMessage(this, me, Permission.Personal, me.skill, String.format(Constants.ACTION_SELECT.get(Skill.Wooer), me.name, first.name));
+        } else { // その他：だいたい毎晩1人指名系
+            me.setTarget(firstId);
+            Res.createNewPersonalMessage(this, me, Permission.Personal, me.skill, String.format(Constants.ACTION_SELECT.get(me.skill), me.name, first.name));
+        }
         return me.save() != null;
     }
 

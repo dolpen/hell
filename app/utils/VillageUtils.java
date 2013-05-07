@@ -12,7 +12,7 @@ public class VillageUtils {
         return village.state == State.Day;
     }
     public static boolean canUseAbility(Village village){
-        return village.state == State.Day;
+        return village.state == State.Night;
     }
     public static boolean canSay(Village village, User user){
         return village.state == State.Closed && user != null && village.exist(user);
