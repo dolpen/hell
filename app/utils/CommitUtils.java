@@ -48,11 +48,12 @@ public class CommitUtils {
      */
     public static Map<Long, Integer> vote(Set<Member> members, Set<Long> allMemberIds, boolean nullable) {
         Map<Long, Integer> votes = Maps.newHashMap();
+        Random random = new Random(System.currentTimeMillis());
         for (Member m : members) {
             Long id = m.targetMemberId;
             if (id == -1L) {
                 if (nullable) continue;
-                id = randomMemberId(allMemberIds, m.memberId);
+                id = randomMemberId(allMemberIds, m.memberId, random);
             }
             Integer num = Objects.firstNonNull(votes.get(id), 0);
             votes.put(id, num + 1);
@@ -81,7 +82,7 @@ public class CommitUtils {
                 candidates.add(memberId);
             }
         }
-        return randomMember(candidates);
+        return randomMember(candidates,null);
     }
 
     /**
@@ -108,11 +109,11 @@ public class CommitUtils {
      * @param excludeId    除外対象ID
      * @return ランダムに選ばれたID
      */
-    public static Long randomMemberId(Set<Long> allMemberIds, Long excludeId) {
+    public static Long randomMemberId(Set<Long> allMemberIds, Long excludeId,Random random) {
         if (allMemberIds == null || allMemberIds.isEmpty()) return null;
         Set<Long> excludeIds = Sets.newHashSet();
         excludeIds.add(excludeId);
-        return randomMemberId(allMemberIds, excludeIds);
+        return randomMemberId(allMemberIds, excludeIds,random);
     }
 
     /**
@@ -122,10 +123,10 @@ public class CommitUtils {
      * @param excludeIds   除外対象ID
      * @return ランダムに選ばれたID
      */
-    public static Long randomMemberId(Set<Long> allMemberIds, Set<Long> excludeIds) {
+    public static Long randomMemberId(Set<Long> allMemberIds, Set<Long> excludeIds,Random random) {
         if (allMemberIds == null || allMemberIds.isEmpty()) return null;
         if (excludeIds == null || excludeIds.isEmpty()) excludeIds = Sets.newHashSet();
-        return randomMember(Sets.difference(allMemberIds, excludeIds));
+        return randomMember(Sets.difference(allMemberIds, excludeIds),random);
     }
 
     /**
@@ -134,8 +135,8 @@ public class CommitUtils {
      * @param memberIds 選択対象IDの集合
      * @return 選ばれたID
      */
-    public static Long randomMember(Set<Long> memberIds) {
-        Random random = new Random(System.currentTimeMillis());
+    public static Long randomMember(Set<Long> memberIds,Random random) {
+        if(random==null) random = new Random(System.currentTimeMillis());
         return Lists.newArrayList(memberIds).get(random.nextInt(memberIds.size()));
     }
 

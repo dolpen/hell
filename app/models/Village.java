@@ -310,7 +310,7 @@ public class Village extends GenericModel {
             if (m.skill == Skill.Hamster && sp == null) sp = Team.Hamster;
         }
         // 生き残った恋人(!=陣営)のカウント
-        if (!Sets.intersection(lovers,survivors).isEmpty()) sp = Team.Lovers;
+        if (!Sets.intersection(lovers, survivors).isEmpty()) sp = Team.Lovers;
         // 引き分け
         if (wolf + human == 0) {
             toEpilogue(Team.Others, null);
@@ -385,7 +385,7 @@ public class Village extends GenericModel {
         Set<Long> memberIds = names.keySet();
         List<String> voteMessages = Lists.newArrayList();
         for (Member m : alives) {
-            Long id = m.isCommitable() ? m.targetMemberId : CommitUtils.randomMemberId(memberIds, m.memberId);
+            Long id = m.isCommitable() ? m.targetMemberId : CommitUtils.randomMemberId(memberIds, m.memberId, null);
             voteMessages.add(String.format(Constants.VOTE_ACTION, m.name, names.get(id).name) + (m.isCommitable() ? "" : Constants.RANDOM));
             m.targetMemberId = id;
         }
@@ -436,33 +436,34 @@ public class Village extends GenericModel {
         state = State.Day;
         nextCommit = DateTime.now().plusMinutes(dayTime).toDate();
 
+        Random random = new Random(System.currentTimeMillis());
         // 恋関連処理
 
         if (Skill.Cupid.hasAbility(dayCount - 1)) {
             for (Member m : work.get(Skill.Cupid)) {
-                boolean random = false;
+                boolean isRandom = false;
                 if (m.targetMemberId2 <= 0L) {
-                    random = true;
-                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId3));
+                    isRandom = true;
+                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId3), random);
                 }
                 if (m.targetMemberId3 <= 0L) {
-                    random = true;
-                    m.targetMemberId3 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId2));
+                    isRandom = true;
+                    m.targetMemberId3 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId2), random);
                 }
                 Member first = names.get(m.targetMemberId2);
                 Member second = names.get(m.targetMemberId3);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Cupid), m.name, first.name, second.name) + (random ? Constants.RANDOM : ""));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Cupid), m.name, first.name, second.name) + (isRandom ? Constants.RANDOM : ""));
                 first.team = second.team = Team.Lovers;
             }
             for (Member m : work.get(Skill.Wooer)) {
-                boolean random = false;
+                boolean isRandom = false;
                 if (m.targetMemberId2 <= 0L) {
-                    random = true;
-                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.memberId));
+                    isRandom = true;
+                    m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.memberId), random);
                 }
                 if (m.targetMemberId3 <= 0L) m.targetMemberId3 = m.memberId;
                 Member first = names.get(m.targetMemberId3);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, first.name) + (random ? Constants.RANDOM : ""));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, first.name) + (isRandom ? Constants.RANDOM : ""));
                 first.team = Team.Lovers;
             }
             Map<Long, Set<Member>> lovers = CommitUtils.loversGraph(members);
@@ -479,7 +480,7 @@ public class Village extends GenericModel {
 
         // 占い結果
         for (Member m : work.get(Skill.Augur)) {
-            Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId)));
+            Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId, random)));
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_ACTION, target.name, target.skill.getAppearance()) + (m.isCommitable() ? "" : Constants.RANDOM));
             if (target.skill == Skill.Hamster)
                 horrible.add(m.memberId); // 無残入り
@@ -488,7 +489,7 @@ public class Village extends GenericModel {
         Set<Long> guardIds = Sets.newHashSet();
         if (dayCount > 2) { // 働くのは3日目夜明けより
             for (Member m : work.get(Skill.Hunter)) {
-                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId)));
+                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId, random)));
                 guardIds.add(target.memberId);
                 Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Hunter), target.name) + (m.isCommitable() ? "" : Constants.RANDOM));
             }
