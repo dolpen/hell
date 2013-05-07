@@ -3,7 +3,7 @@
     font-size: small;
     padding: 9px 0;
     position: fixed;
-    top: 60px;
+    top: 36px;
     width : 280px;
 }
 
@@ -12,8 +12,8 @@
 }
 
 .left-navigation {
-    max-height: 100%;
-    padding-bottom: 20px;
+    max-height: 95%;
+    margin-bottom: 50px;
     overflow: auto;
 }
 
