@@ -45,6 +45,9 @@ public class Village extends GenericModel {
     // 結果
     public Team winner = Team.Others; // 勝者不定
 
+    @Version
+    public Date updated = null;
+
     public static Village findById(Long villageId) {
         return find("villageId = ?1", villageId).first();
     }
@@ -86,16 +89,16 @@ public class Village extends GenericModel {
                 v.nextCommit = null;
             }
         }
-        v = v.save();
-        if (v == null) return null;
+        v.save();
+        v.merge();
+        if(!dummy)return v;
         // 人狼、それは
         Res.createNewSystemMessage(v, Permission.Public, Skill.Dummy, Constants.VILLAGE_SETTLE);
         // ダミーの入村
         if (dummy) {
             v.enterDummy();
-            v = v.save();
         }
-        return v;
+        return v.save();
     }
 
     /**
@@ -254,6 +257,8 @@ public class Village extends GenericModel {
      */
     public boolean tryCommit() {
         boolean force = nextCommit != null && nextCommit.before(new Date(System.currentTimeMillis()));
+        Logger.info("nextCommit : " + nextCommit.toString());
+        Logger.info("force : " + force);
         if (state == State.Prologue) {
             if (!force) return false;
             boolean success = start();
