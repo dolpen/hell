@@ -5,13 +5,13 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
 import consts.CookieName;
 import models.*;
-import models.enums.Permission;
 import models.enums.State;
 import play.mvc.Controller;
 import play.mvc.Router;
 import play.mvc.Util;
-import utils.CharacterUtil;
-import utils.ResUtil;
+import utils.CharacterUtils;
+import utils.ResUtils;
+import utils.VillageUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -83,11 +83,11 @@ public class Games extends Controller {
         boolean finished = village.isFinished();
         boolean now = village.dayCount == day && village.state != State.Closed;
         // ログ
-        List<Res> logs = ResUtil.getRes(village, me, day, alive, finished, all ? 0 : 50);
+        List<Res> logs = ResUtils.getRes(village, me, day, alive, finished, all ? 0 : 50);
         boolean skipped = !all && logs.size() > 50;
         if (skipped) logs.remove(0);
         // ここまでログ
-        List<Chara> charas = CharacterUtil.getCharacters(village, me);
+        List<Chara> charas = CharacterUtils.getCharacters(village, me);
         render(village, logs, now, day, exist, alive, me, members, charas, admin, closet, ability, finished);
     }
 
@@ -112,7 +112,7 @@ public class Games extends Controller {
     public static void target(Long villageId, Long firstId, Long secondId) {
         User user = getUser();
         Village village = getVillage(villageId);
-        if (village.state == State.Night) {
+        if (VillageUtils.canUseAbility(village)) {
             village.setTarget(user, firstId, secondId);
         }
         redirectToVillage(villageId);
@@ -127,7 +127,7 @@ public class Games extends Controller {
     public static void vote(Long villageId, Long firstId) {
         User user = getUser();
         Village village = getVillage(villageId);
-        if (village.state == State.Day) {
+        if (VillageUtils.canVote(village)) {
             village.setTarget(user, firstId, null);
         }
         redirectToVillage(villageId);
@@ -145,11 +145,9 @@ public class Games extends Controller {
         }
         Village village = getVillage(villageId);
         User user = tryGetUser();
-        if (user == null || !village.exist(user) || village.state == State.Closed) {
-            redirectToVillage(villageId);
+        if (VillageUtils.canSay(village, user)) {
+            Res.say(village, Member.findByIds(village, user), text);
         }
-        if (village.state == State.Night) wisper(villageId, text);
-        Res.createNewRes(village, Member.findByIds(village, user), Permission.Public, text);
         redirectToVillage(villageId);
     }
 
@@ -165,10 +163,9 @@ public class Games extends Controller {
         }
         Village village = getVillage(villageId);
         User user = tryGetUser();
-        if (user == null || !village.exist(user) || village.state == State.Closed) {
-            redirectToVillage(villageId);
+        if (VillageUtils.canSay(village, user)) {
+            Res.wisper(village, Member.findByIds(village, user), text);
         }
-        Res.createNewRes(village, Member.findByIds(village, user), Permission.Personal, text);
         redirectToVillage(villageId);
     }
 
@@ -179,32 +176,42 @@ public class Games extends Controller {
      * @param text      内容
      */
     public static void spirit(Long villageId, String text) {
+
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
         User user = tryGetUser();
-        if (user == null || !village.exist(user) || village.state == State.Closed) {
-            redirectToVillage(villageId);
+        if (VillageUtils.canSay(village, user)) {
+            Res.spirit(village, Member.findByIds(village, user), text);
         }
-        Res.createNewRes(village, Member.findByIds(village, user), Permission.Spirit, text);
         redirectToVillage(villageId);
     }
 
+    /**
+     * 秘密発言
+     *
+     * @param villageId 村ID
+     * @param text      内容
+     */
     public static void closet(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
-        User user = getUser();
-        if (user == null || !village.exist(user) || village.state == State.Closed) {
-            redirectToVillage(villageId);
+        User user = tryGetUser();
+        if (VillageUtils.canSay(village, user)) {
+            Res.closet(village, Member.findByIds(village, user), text);
         }
-        if (village.state != State.Night) wisper(villageId, text);
-        Res.createNewRes(village, Member.findByIds(village, user), Permission.Group, text);
         redirectToVillage(villageId);
     }
 
+    /**
+     * 入村
+     *
+     * @param villageId   村ID
+     * @param characterId 使用キャラクター
+     */
     public static void enter(Long villageId, Long characterId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -212,6 +219,11 @@ public class Games extends Controller {
         redirectToVillage(villageId);
     }
 
+    /**
+     * 退村
+     *
+     * @param villageId 村ID
+     */
     public static void leave(Long villageId) {
         User user = getUser();
         Village village = getVillage(villageId);

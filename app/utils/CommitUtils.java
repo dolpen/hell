@@ -9,7 +9,7 @@ import models.enums.Skill;
 
 import java.util.*;
 
-public class CommitUtil {
+public class CommitUtils {
 
     /**
      * 恋人後追いグラフを作ります

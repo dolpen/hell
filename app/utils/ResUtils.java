@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * @author dolpen
  */
-public class ResUtil {
+public class ResUtils {
 
     public static List<Res> getRes(Village village, Member me, int day, boolean alive, boolean finished, int limit) {
         List<Res> logs = getResList(village, me, day, alive, finished, limit == 0 ? 0 : (limit + 1));

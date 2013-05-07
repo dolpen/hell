@@ -12,8 +12,8 @@ import models.enums.Team;
 import org.joda.time.DateTime;
 import play.Logger;
 import play.db.jpa.GenericModel;
-import utils.CommitUtil;
-import utils.MemberUtil;
+import utils.CommitUtils;
+import utils.MemberUtils;
 import utils.SkillUtils;
 
 import javax.persistence.*;
@@ -95,7 +95,6 @@ public class Village extends GenericModel {
             v.enterDummy();
             v = v.save();
         }
-
         return v;
     }
 
@@ -199,10 +198,10 @@ public class Village extends GenericModel {
             return false;
         List<Skill> skills = map.get(memberCount);
         List<Member> members = Member.findByVillage(this);
-        if (!MemberUtil.setSkill(skills, members, dummyMemberId)) return false;
-        Map<Skill, Set<Member>> work = MemberUtil.skillMembers(members);
+        if (!MemberUtils.setSkill(skills, members, dummyMemberId)) return false;
+        Map<Skill, Set<Member>> work = MemberUtils.skillMembers(members);
         // 聖痕者のナンバリング
-        if (!MemberUtil.numberingStigmata(work.get(Skill.Stigmata))) return false;
+        if (!MemberUtils.numberingStigmata(work.get(Skill.Stigmata))) return false;
 
 // 内訳発表
         List<String> countMessages = Lists.newArrayList();
@@ -375,18 +374,18 @@ public class Village extends GenericModel {
         for (Member m : members)
             if (m.isAlive()) alives.add(m);
         // 生存者から投票の集計
-        Map<Long, Member> names = MemberUtil.memberMap(alives); // id -> object
+        Map<Long, Member> names = MemberUtils.memberMap(alives); // id -> object
         Set<Long> memberIds = names.keySet();
         List<String> voteMessages = Lists.newArrayList();
         for (Member m : alives) {
-            Long id = m.isCommitable() ? m.targetMemberId : CommitUtil.randomMemberId(memberIds, m.memberId);
+            Long id = m.isCommitable() ? m.targetMemberId : CommitUtils.randomMemberId(memberIds, m.memberId);
             voteMessages.add(String.format(Constants.VOTE_ACTION, m.name, names.get(id).name) + (m.isCommitable() ? "" : Constants.RANDOM));
             m.targetMemberId = id;
         }
-        Map<Long, Integer> votes = CommitUtil.vote(Sets.newHashSet(alives), memberIds, false); // id -> 票数
+        Map<Long, Integer> votes = CommitUtils.vote(Sets.newHashSet(alives), memberIds, false); // id -> 票数
         //for (Long memberId : votes.keySet()) Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.VOTE_COUNT, names.get(memberId).name, votes.get(memberId)));
         // 処刑対象の決定
-        Long inmateId = CommitUtil.getElected(memberIds, votes);
+        Long inmateId = CommitUtils.getElected(memberIds, votes);
         Member inmate = names.get(inmateId);
         if (inmate == null)
             Logger.error("not found inmate : " + inmateId + " alive : " + Arrays.deepToString(alives.toArray()));
@@ -398,7 +397,7 @@ public class Village extends GenericModel {
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
         // 選択された対象のリセット
-        CommitUtil.resetTargets(alives);
+        CommitUtils.resetTargets(alives);
         if (!endCheck(alives)) {
             // 無事なら続行
             state = State.Night;
@@ -419,10 +418,10 @@ public class Village extends GenericModel {
         List<Member> alives = Lists.newArrayList();
         for (Member m : members)
             if (m.isAlive()) alives.add(m);
-        Map<Skill, Set<Member>> work = MemberUtil.skillMembers(alives);
-        Map<Long, Member> names = MemberUtil.memberMap(alives); // id -> object
+        Map<Skill, Set<Member>> work = MemberUtils.skillMembers(alives);
+        Map<Long, Member> names = MemberUtils.memberMap(alives); // id -> object
         // 狼：襲撃先の選定
-        Long victimId = CommitUtil.processAttack(work.get(Skill.Werewolf), names.keySet(), dummyMemberId, dayCount);
+        Long victimId = CommitUtils.processAttack(work.get(Skill.Werewolf), names.keySet(), dummyMemberId, dayCount);
         // 夜明け
         dayCount++;
         state = State.Day;
@@ -433,7 +432,7 @@ public class Village extends GenericModel {
 
         // 占い結果
         for (Member m : work.get(Skill.Augur)) {
-            Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
+            Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId)));
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_ACTION, target.name, target.skill.getAppearance()) + (m.isCommitable() ? "" : Constants.RANDOM));
             if (target.skill == Skill.Hamster)
                 horrible.add(m.memberId); // 無残入り
@@ -442,7 +441,7 @@ public class Village extends GenericModel {
         Set<Long> guardIds = Sets.newHashSet();
         if (dayCount > 2) { // 働くのは3日目夜明けより
             for (Member m : work.get(Skill.Hunter)) {
-                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtil.randomMemberId(names.keySet(), m.memberId)));
+                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId)));
                 guardIds.add(target.memberId);
                 Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.GUARD_ACTION, target.name) + (m.isCommitable() ? "" : Constants.RANDOM));
             }
@@ -468,7 +467,7 @@ public class Village extends GenericModel {
         // 恋人連鎖
         //killLovers(members, names, horrible);
         // 選択された対象のリセット
-        CommitUtil.resetTargets(alives);
+        CommitUtils.resetTargets(alives);
         endCheck(alives);
         return save() != null;
     }
@@ -481,7 +480,7 @@ public class Village extends GenericModel {
      * @param dead    今回死んだ人間
      */
     private void killLovers(List<Member> members, Map<Long, Member> names, Set<Long> dead) {
-        Map<Long, Set<Member>> lovers = CommitUtil.loversGraph(members);
+        Map<Long, Set<Member>> lovers = CommitUtils.loversGraph(members);
         ArrayDeque<Long> chainQueue = new ArrayDeque<Long>();
         chainQueue.addAll(dead);
         while (!chainQueue.isEmpty()) {

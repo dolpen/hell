@@ -2,7 +2,10 @@ package models;
 
 import com.google.common.base.Objects;
 import consts.Constants;
-import models.enums.*;
+import models.enums.LogType;
+import models.enums.Permission;
+import models.enums.Skill;
+import models.enums.State;
 import play.db.jpa.Model;
 
 import javax.persistence.CascadeType;
@@ -101,31 +104,17 @@ public class Res extends Model {
      * @return class
      */
     public String getLogClass() {
-        String res = "";
-        if (logType == LogType.Say) { // say
-            res += "log_say";
-            switch (permission) {
-                case Personal:
-                    res += " log_wisper";
-                    break;
-                case Group:
-                    res += " pm_" + skill.name().toLowerCase();
-                    break;
-                case Spirit:
-                    res += " log_spirit";
-                    break;
-            }
-        } else { // system message
-            res += "log_system";
-            switch (permission) {
-                case Personal:
-                case Group:
-                    res += " pm_" + skill.name().toLowerCase();
-                    break;
-                case Spirit:
-                    res += " log_spirit";
-                    break;
-            }
+        String res = (logType == LogType.Say) ? "log_say" : "log_system";
+        switch (permission) {
+            case Personal:
+                res += (logType == LogType.Say) ? " log_wisper" : "";
+                break;
+            case Group:
+                res += " pm_" + skill.name().toLowerCase();
+                break;
+            case Spirit:
+                res += " log_spirit";
+                break;
         }
         return res;
     }
@@ -140,23 +129,11 @@ public class Res extends Model {
      * @param body       本文
      * @return 追加できれば<code>true</code>
      */
-    public static boolean createNewRes(Village village, Member member, Permission permission, String body) {
-        if (permission == Permission.Group && member.skill.getGroup() == Group.Dummy) permission = Permission.Personal;
-        if (village.isRunning()) {
-            // 生存状態と異なるパーミッションでの発言は出来ない
-            if ((permission == Permission.Spirit) == member.isAlive()) permission = Permission.Personal;
-        } else {
-            // 開始前と決着後は霊界発言不可能
-            if (permission == Permission.Spirit) permission = Permission.Personal;
-        }
+    private static boolean createNewRes(Village village, Member member, Permission permission, String body) {
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;
-        if (village.state == State.Epilogue) {
-            r.name = String.format("%s(%s)", member.name, member.user.name);
-        } else {
-            r.name = member.name;
-        }
+        r.name = (village.state == State.Epilogue) ? String.format("%s(%s)", member.name, member.user.name) : member.name;
         r.chara = member.chara;
         r.dayCount = village.dayCount;
         r.postDate = new Date();
@@ -165,6 +142,58 @@ public class Res extends Model {
         r.body = body;
         r.logType = LogType.Say;
         return r.save() != null;
+    }
+
+
+    /**
+     * 発言
+     *
+     * @param village 村
+     * @param member  発言、閲覧対象の参加者
+     * @param body    本文
+     * @return 追加できれば<code>true</code>
+     */
+    public static boolean say(Village village, Member member, String body) {
+        if (!member.isAlive() && !village.isFinished()) return false; // 村終了前and死亡者は霊界発言不可
+        return createNewRes(village, member, Permission.Public, body);
+    }
+
+    /**
+     * 独り言
+     *
+     * @param village 村
+     * @param member  発言、閲覧対象の参加者
+     * @param body    本文
+     * @return 追加できれば<code>true</code>
+     */
+    public static boolean wisper(Village village, Member member, String body) {
+        return createNewRes(village, member, Permission.Personal, body);
+    }
+
+    /**
+     * 秘密会話
+     *
+     * @param village 村
+     * @param member  発言、閲覧対象の参加者
+     * @param body    本文
+     * @return 追加できれば<code>true</code>
+     */
+    public static boolean closet(Village village, Member member, String body) {
+        if (village.state != State.Night || !member.isAlive() || !member.skill.hasCloset()) return false;
+        return createNewRes(village, member, Permission.Group, body);
+    }
+
+    /**
+     * 霊界会話
+     *
+     * @param village 村
+     * @param member  発言、閲覧対象の参加者
+     * @param body    本文
+     * @return 追加できれば<code>true</code>
+     */
+    public static boolean spirit(Village village, Member member, String body) {
+        if (member.isAlive() || village.isFinished()) return false; // 村終了時or生存者は霊界発言不可
+        return createNewRes(village, member, Permission.Spirit, body);
     }
 
     /**

@@ -7,7 +7,7 @@ import models.enums.Skill;
 
 import java.util.*;
 
-public class MemberUtil {
+public class MemberUtils {
     /**
      * 役職ごとのメンバー一覧をmapで得る
      *

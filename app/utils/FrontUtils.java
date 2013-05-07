@@ -3,6 +3,6 @@ package utils;
 /**
  * @author dolpen
  */
-public class FrontUtil {
+public class FrontUtils {
 
 }

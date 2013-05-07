@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * @author dolpen
  */
-public class CharacterUtil {
+public class CharacterUtils {
     public static List<Chara> getCharacters(Village village, Member me) {
         if (village.state == State.Prologue && me == null)
             return Chara.findAllByParty(Party.findById(village.partyId));
