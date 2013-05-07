@@ -6,6 +6,8 @@ import models.Village;
 import models.enums.State;
 import play.data.binding.As;
 import play.data.validation.Required;
+import play.db.jpa.NoTransaction;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 
 import java.util.Date;
@@ -17,6 +19,7 @@ public class Options extends Controller {
     /**
      * 村建て画面
      */
+    @NoTransaction
     public static void settle() {
         if (getUserId() <= 0L)
             Application.index();
@@ -32,6 +35,7 @@ public class Options extends Controller {
      * @param nightTime 夜の時間
      * @param dummy     ダミー有無
      */
+    @Transactional
     public static void settleVillage(@Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy, @As(Constants.DATETIME_PICKER) Date time) {
         User user = getUser();
         if (user == null) Application.index();
@@ -47,6 +51,7 @@ public class Options extends Controller {
      *
      * @param villageId 村ID
      */
+    @Transactional(readOnly=true)
     public static void update(@Required Long villageId) {
         if (validation.hasErrors())
             Application.index();
@@ -69,6 +74,7 @@ public class Options extends Controller {
      * @param dummy     ダミー有無
      * @param time      開始予定時刻
      */
+    @Transactional
     public static void updateVillage(@Required Long villageId, @Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy, @As(Constants.DATETIME_PICKER) Date time) {
         if (validation.hasErrors() && !(validation.errorsMap().keySet().size() == 1 && validation.errorsMap().keySet().contains("time"))) {
             if(villageId!=null)update(villageId);
@@ -85,6 +91,7 @@ public class Options extends Controller {
      *
      * @param villageId 村ID
      */
+    @Transactional
     public static void startVillage(@Required Long villageId) {
         if (validation.hasErrors()) Application.index();
         Village village = Village.findByIdAndAdmin(villageId, getUserId());
@@ -100,6 +107,7 @@ public class Options extends Controller {
      * @param villageId 村ID
      * @param memberId  参加者ID
      */
+    @Transactional
     public static void kick(@Required Long villageId, @Required Long memberId) {
         if (validation.hasErrors()) Application.index();
         Long userId = getUserId();

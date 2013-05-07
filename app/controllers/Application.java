@@ -4,6 +4,7 @@ import com.google.common.base.Objects;
 import consts.CookieName;
 import models.User;
 import models.Village;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Util;
 
@@ -20,6 +21,7 @@ public class Application extends Controller {
      *
      * @return ユーザID
      */
+    @Util
     static Long getUserId() {
         return Long.valueOf(Objects.firstNonNull(session.get(CookieName.USER_ID), "-1"));
     }
@@ -27,6 +29,7 @@ public class Application extends Controller {
     /**
      * トップページ
      */
+    @Transactional(readOnly=true)
     public static void index() {
         List<Village> villages = Village.all().fetch();
         render(villages);

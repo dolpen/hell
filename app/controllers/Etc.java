@@ -1,6 +1,7 @@
 package controllers;
 
 import models.*;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 
 public class Etc extends Controller {
@@ -36,6 +37,7 @@ public class Etc extends Controller {
             "産婆 スージー"
     };
 
+    @Transactional
     public static void reset() {
         if(Village.count()>0)notFound();
         Village.deleteAll();

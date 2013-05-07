@@ -6,6 +6,7 @@ import com.google.common.collect.Maps;
 import consts.CookieName;
 import models.*;
 import models.enums.State;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Router;
 import play.mvc.Util;
@@ -50,6 +51,7 @@ public class Games extends Controller {
      *
      * @param villageId 村ID
      */
+    @Transactional(readOnly = true)
     private static void redirectToVillage(Long villageId) {
         if (villageId == null) {
             Application.index();
@@ -66,6 +68,7 @@ public class Games extends Controller {
      * @param day       日数
      * @param all       ログ全件閲覧フラグ
      */
+    @Transactional
     public static void index(Long villageId, Integer day, Boolean all) {
         Village village = getVillage(villageId);
         village.tryCommit();
@@ -96,6 +99,7 @@ public class Games extends Controller {
      *
      * @param villageId 村ID
      */
+    @Transactional(readOnly = true)
     public static void detail(Long villageId) {
         Village village = getVillage(villageId);
         render(village);
@@ -109,6 +113,7 @@ public class Games extends Controller {
      * @param firstId   対象1
      * @param secondId  対象2
      */
+    @Transactional
     public static void target(Long villageId, Long firstId, Long secondId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -125,6 +130,7 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param firstId   投票先参加者ID
      */
+    @Transactional
     public static void vote(Long villageId, Long firstId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -141,6 +147,7 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param text      内容
      */
+    @Transactional
     public static void say(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
@@ -160,6 +167,7 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param text      内容
      */
+    @Transactional
     public static void wisper(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
@@ -179,8 +187,8 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param text      内容
      */
+    @Transactional
     public static void spirit(Long villageId, String text) {
-
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
         }
@@ -199,6 +207,7 @@ public class Games extends Controller {
      * @param villageId 村ID
      * @param text      内容
      */
+    @Transactional
     public static void closet(Long villageId, String text) {
         if (Strings.isNullOrEmpty(text)) {
             redirectToVillage(villageId);
@@ -218,6 +227,7 @@ public class Games extends Controller {
      * @param villageId   村ID
      * @param characterId 使用キャラクター
      */
+    @Transactional
     public static void enter(Long villageId, Long characterId) {
         User user = getUser();
         Village village = getVillage(villageId);
@@ -231,6 +241,7 @@ public class Games extends Controller {
      *
      * @param villageId 村ID
      */
+    @Transactional
     public static void leave(Long villageId) {
         User user = getUser();
         Village village = getVillage(villageId);

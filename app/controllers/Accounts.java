@@ -2,6 +2,8 @@ package controllers;
 
 import consts.CookieName;
 import models.User;
+import play.db.jpa.NoTransaction;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 
 public class Accounts extends Controller {
@@ -9,6 +11,7 @@ public class Accounts extends Controller {
     /**
      * ユーザー登録ページ
      */
+    @NoTransaction
     public static void index() {
         render();
     }
@@ -19,6 +22,7 @@ public class Accounts extends Controller {
      * @param name 名前
      * @param pass パスワード
      */
+    @Transactional
     public static void regist(String name, String pass) {
         if (User.get(name, pass) != null) {
             render();
@@ -33,6 +37,7 @@ public class Accounts extends Controller {
      * @param name 名前
      * @param pass パスワード
      */
+    @Transactional(readOnly = true)
     public static void login(String name, String pass) {
         User user = User.get(name, pass);
         if (user != null) {
@@ -46,6 +51,7 @@ public class Accounts extends Controller {
     /**
      * ログアウト
      */
+    @NoTransaction
     public static void logout() {
         session.remove(CookieName.USER_ID);
         Application.index();

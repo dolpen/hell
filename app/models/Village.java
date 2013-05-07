@@ -487,7 +487,7 @@ public class Village extends GenericModel {
         }
         // 護衛
         Set<Long> guardIds = Sets.newHashSet();
-        if (dayCount > 2) { // 働くのは3日目夜明けより
+        if (Skill.Hunter.hasAbility(dayCount - 1)) { // 働くのは3日目夜明けより
             for (Member m : work.get(Skill.Hunter)) {
                 Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId, random)));
                 guardIds.add(target.memberId);
