@@ -15,6 +15,6 @@ public class VillageUtils {
         return village.state == State.Night;
     }
     public static boolean canSay(Village village, User user){
-        return village.state == State.Closed && user != null && village.exist(user);
+        return village.state != State.Closed && user != null && village.exist(user);
     }
 }
