@@ -112,6 +112,7 @@ public class Games extends Controller {
     public static void target(Long villageId, Long firstId, Long secondId) {
         User user = getUser();
         Village village = getVillage(villageId);
+        village.tryCommit();
         if (VillageUtils.canUseAbility(village)) {
             village.setTarget(user, firstId, secondId);
         }
@@ -127,6 +128,7 @@ public class Games extends Controller {
     public static void vote(Long villageId, Long firstId) {
         User user = getUser();
         Village village = getVillage(villageId);
+        village.tryCommit();
         if (VillageUtils.canVote(village)) {
             village.setTarget(user, firstId, null);
         }
@@ -144,6 +146,7 @@ public class Games extends Controller {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
+        village.tryCommit();
         User user = tryGetUser();
         if (VillageUtils.canSay(village, user)) {
             Res.say(village, Member.findByIds(village, user), text);
@@ -162,6 +165,7 @@ public class Games extends Controller {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
+        village.tryCommit();
         User user = tryGetUser();
         if (VillageUtils.canSay(village, user)) {
             Res.wisper(village, Member.findByIds(village, user), text);
@@ -181,6 +185,7 @@ public class Games extends Controller {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
+        village.tryCommit();
         User user = tryGetUser();
         if (VillageUtils.canSay(village, user)) {
             Res.spirit(village, Member.findByIds(village, user), text);
@@ -199,6 +204,7 @@ public class Games extends Controller {
             redirectToVillage(villageId);
         }
         Village village = getVillage(villageId);
+        village.tryCommit();
         User user = tryGetUser();
         if (VillageUtils.canSay(village, user)) {
             Res.closet(village, Member.findByIds(village, user), text);
@@ -215,6 +221,7 @@ public class Games extends Controller {
     public static void enter(Long villageId, Long characterId) {
         User user = getUser();
         Village village = getVillage(villageId);
+        village.tryCommit();
         village.enter(user, characterId);
         redirectToVillage(villageId);
     }
@@ -227,6 +234,7 @@ public class Games extends Controller {
     public static void leave(Long villageId) {
         User user = getUser();
         Village village = getVillage(villageId);
+        village.tryCommit();
         village.leave(user);
         redirectToVillage(villageId);
     }
