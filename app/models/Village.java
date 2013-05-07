@@ -292,17 +292,25 @@ public class Village extends GenericModel {
     private boolean endCheck(List<Member> members) {
         int human = 0, wolf = 0;
         Team sp = null;
+        Set<Long> lovers = Sets.newHashSet();
+        Set<Long> survivors = Sets.newHashSet();
         // カウントと特殊勝利条件の判定
         for (Member m : members) {
+            if (m.skill == Skill.Cupid || m.skill == Skill.Wooer) {
+                lovers.add(m.targetMemberId2);
+                lovers.add(m.targetMemberId2);
+            }
             if (!m.isAlive()) continue;
+            survivors.add(m.memberId);
             if (m.skill == Skill.Werewolf) {
                 wolf++;
             } else {
                 human++;
             }
             if (m.skill == Skill.Hamster && sp == null) sp = Team.Hamster;
-            if (m.team == Team.Lovers) sp = Team.Lovers;
         }
+        // 生き残った恋人(!=陣営)のカウント
+        if (!Sets.intersection(lovers,survivors).isEmpty()) sp = Team.Lovers;
         // 引き分け
         if (wolf + human == 0) {
             toEpilogue(Team.Others, null);
@@ -399,7 +407,7 @@ public class Village extends GenericModel {
         killLovers(members, names, Sets.newHashSet(inmateId));
         // 選択された対象のリセット
         CommitUtils.resetTargets(alives);
-        if (!endCheck(alives)) {
+        if (!endCheck(members)) {
             // 無事なら続行
             state = State.Night;
             nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
@@ -506,7 +514,7 @@ public class Village extends GenericModel {
         // 恋人連鎖
         killLovers(members, names, horrible);
         // 選択された対象のリセット
-        CommitUtils.resetTargets(alives);
+        CommitUtils.resetTargets(members);
         endCheck(alives);
         return save() != null;
     }
