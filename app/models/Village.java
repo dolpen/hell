@@ -369,6 +369,7 @@ public class Village extends GenericModel {
     }
 
     private boolean toClose() {
+        merge();
         state = State.Closed;
         nextCommit = null;
         return save() != null;
