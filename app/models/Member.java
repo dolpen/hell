@@ -99,6 +99,13 @@ public class Member extends GenericModel {
     }
 
     /**
+     * @return 役職名
+     */
+    public String getLabel() {
+        return (skill == Skill.Stigmata) ? (skill.getLabel() + targetMemberId2) : skill.getLabel();
+    }
+
+    /**
      * @return ダミーなら<code>true</code>
      */
     public boolean isDummy() {
@@ -186,6 +193,7 @@ public class Member extends GenericModel {
         targetMemberId3 = tgt2;
         return validateAndSave();
     }
+
     /**
      * 能力や投票の対象を選ぶ
      *

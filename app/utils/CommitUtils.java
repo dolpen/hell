@@ -4,8 +4,12 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import consts.Constants;
 import models.Member;
+import models.Res;
+import models.enums.Permission;
 import models.enums.Skill;
+import models.enums.Team;
 
 import java.util.*;
 
@@ -82,7 +86,7 @@ public class CommitUtils {
                 candidates.add(memberId);
             }
         }
-        return randomMember(candidates,null);
+        return randomMember(candidates, null);
     }
 
     /**
@@ -103,17 +107,56 @@ public class CommitUtils {
     }
 
     /**
+     * 役職ランダム(キューピッド)
+     * 自分を含む2人(重複不可)に矢を打つ
+     *
+     * @return ランダムなら<code>true</code>
+     */
+    public static boolean processCupid(Member m, Map<Long, Member> names, Random random) {
+        boolean isRandom = false;
+        if (m.targetMemberId2 <= 0L) {
+            isRandom = true;
+            m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId3), random);
+        }
+        if (m.targetMemberId3 <= 0L) {
+            isRandom = true;
+            m.targetMemberId3 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.targetMemberId2), random);
+        }
+        Member first = names.get(m.targetMemberId2);
+        Member second = names.get(m.targetMemberId3);
+        first.team = second.team = Team.Lovers;
+        return isRandom;
+    }
+
+    /**
+     * 役職ランダム(求愛)
+     * 自分以外の1人に矢を打つ
+     *
+     * @return ランダムなら<code>true</code>
+     */
+    public static boolean processWooer(Member m, Map<Long, Member> names, Random random) {
+        boolean isRandom = false;
+        if (m.targetMemberId2 <= 0L) {
+            isRandom = true;
+            m.targetMemberId2 = CommitUtils.randomMemberId(names.keySet(), Sets.newHashSet(m.memberId), random);
+        }
+        if (m.targetMemberId3 <= 0L) m.targetMemberId3 = m.memberId;
+        names.get(m.targetMemberId3).team = Team.Lovers;
+        return isRandom;
+    }
+
+    /**
      * 役職ランダム
      *
      * @param allMemberIds 探索対象ID
      * @param excludeId    除外対象ID
      * @return ランダムに選ばれたID
      */
-    public static Long randomMemberId(Set<Long> allMemberIds, Long excludeId,Random random) {
+    public static Long randomMemberId(Set<Long> allMemberIds, Long excludeId, Random random) {
         if (allMemberIds == null || allMemberIds.isEmpty()) return null;
         Set<Long> excludeIds = Sets.newHashSet();
         excludeIds.add(excludeId);
-        return randomMemberId(allMemberIds, excludeIds,random);
+        return randomMemberId(allMemberIds, excludeIds, random);
     }
 
     /**
@@ -123,10 +166,10 @@ public class CommitUtils {
      * @param excludeIds   除外対象ID
      * @return ランダムに選ばれたID
      */
-    public static Long randomMemberId(Set<Long> allMemberIds, Set<Long> excludeIds,Random random) {
+    public static Long randomMemberId(Set<Long> allMemberIds, Set<Long> excludeIds, Random random) {
         if (allMemberIds == null || allMemberIds.isEmpty()) return null;
         if (excludeIds == null || excludeIds.isEmpty()) excludeIds = Sets.newHashSet();
-        return randomMember(Sets.difference(allMemberIds, excludeIds),random);
+        return randomMember(Sets.difference(allMemberIds, excludeIds), random);
     }
 
     /**
@@ -135,8 +178,8 @@ public class CommitUtils {
      * @param memberIds 選択対象IDの集合
      * @return 選ばれたID
      */
-    public static Long randomMember(Set<Long> memberIds,Random random) {
-        if(random==null) random = new Random(System.currentTimeMillis());
+    public static Long randomMember(Set<Long> memberIds, Random random) {
+        if (random == null) random = new Random(System.currentTimeMillis());
         return Lists.newArrayList(memberIds).get(random.nextInt(memberIds.size()));
     }
 

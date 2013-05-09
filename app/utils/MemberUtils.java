@@ -79,19 +79,33 @@ public class MemberUtils {
 
     /**
      * 聖痕者にナンバリングする
+     *
      * @param stigmas 聖痕者
      * @return 成功すれば<code>true</code>
      */
-    public static boolean numberingStigmata(Set<Member> stigmas){
-        if(stigmas == null || stigmas.isEmpty())return true;
+    public static boolean numberingStigmata(Set<Member> stigmas) {
+        if (stigmas == null || stigmas.isEmpty()) return true;
         int l = stigmas.size();
         int[] ind = shuffle(l);
         int i = 0;
-        for(Member m : stigmas){
-            if(m.skill!=Skill.Stigmata)return false;
-            m.targetMemberId2 = Integer.valueOf(ind[i]+1).longValue();
+        for (Member m : stigmas) {
+            if (m.skill != Skill.Stigmata) return false;
+            m.targetMemberId2 = Integer.valueOf(ind[i] + 1).longValue();
         }
         return true;
+    }
+
+    /**
+     * 生存者をフィルタリングする
+     *
+     * @param members 死者含む参加者
+     * @return 生存者
+     */
+    public static List<Member> filterAlive(Iterable<Member> members) {
+        List<Member> alive = Lists.newArrayList();
+        for (Member m : members)
+            if (m.isAlive()) alive.add(m);
+        return alive;
     }
 
     /**
