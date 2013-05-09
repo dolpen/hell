@@ -4,10 +4,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import consts.Constants;
-import models.enums.Permission;
-import models.enums.Skill;
-import models.enums.State;
-import models.enums.Team;
+import models.enums.*;
 import org.joda.time.DateTime;
 import play.Logger;
 import play.db.jpa.GenericModel;
@@ -91,13 +88,9 @@ public class Village extends GenericModel {
         }
         v.save();
         v.merge();
-        if (!dummy) return v;
-        // 人狼、それは
         Res.createNewSystemMessage(v, Permission.Public, Skill.Dummy, Constants.VILLAGE_SETTLE);
-        // ダミーの入村
-        if (dummy) {
-            v.enterDummy();
-        }
+        if (!dummy) return v;
+        v.enterDummy();
         return v.save();
     }
 
@@ -271,78 +264,15 @@ public class Village extends GenericModel {
      * @return 決着ついたかどうか
      */
     private boolean endCheck(List<Member> members) {
-        int human = 0, wolf = 0;
-        Team sp = null;
-        Set<Long> lovers = Sets.newHashSet();
-        Set<Long> survivors = Sets.newHashSet();
-        // カウントと特殊勝利条件の判定
-        for (Member m : members) {
-            if (m.skill == Skill.Cupid || m.skill == Skill.Wooer) {
-                lovers.add(m.targetMemberId2);
-                lovers.add(m.targetMemberId2);
-            }
-            if (!m.isAlive()) continue;
-            survivors.add(m.memberId);
-            if (m.skill == Skill.Werewolf) {
-                wolf++;
-            } else {
-                human++;
-            }
-            if (m.skill == Skill.Hamster && sp == null) sp = Team.Hamster;
-        }
-        // 生き残った恋人(!=陣営)のカウント
-        if (!Sets.intersection(lovers, survivors).isEmpty()) sp = Team.Lovers;
-        // 引き分け
-        if (wolf + human == 0) {
-            toEpilogue(Team.Others, null);
-            return true;
-        }
-        // 勝利条件トリガ
-        if (wolf == 0) {
-            toEpilogue(Team.Village, sp);
-            return true;
-        } else if (human <= wolf) {
-            toEpilogue(Team.Wolf, sp);
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * エピローグへのコミット処理
-     *
-     * @param team    勝利条件1
-     * @param special 特殊条件
-     * @return 成功すれば<code>true</code>
-     */
-    private boolean toEpilogue(Team team, Team special) {
-        if (team == null) return false;
-        if (team == Team.Others) {
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.NO_WINNER);
-        } else if (special == null) { // 通常の決着
-            switch (team) {
-                case Wolf:
-                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_WOLF);
-                    break;
-                default:
-                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_VILLAGER);
-            }
-        } else if (special == Team.Lovers) { // 恋人
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_LOVERS);
-        } else { // 妖魔
-            switch (team) {
-                case Wolf:
-                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_HAMSTER_W);
-                    break;
-                default:
-                    Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_HAMSTER_V);
-            }
-        }
-        winner = Objects.firstNonNull(special, team);
+        EpilogueType win = CommitUtils.getWinner(members);
+        if(win==null)return false;
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_MESSAGE.get(win));
+        winner = win.getWinner();
         state = State.Epilogue;
         nextCommit = DateTime.now().plusDays(1).toDate();
         return true;
     }
+
 
     private boolean toClose() {
         state = State.Closed;
@@ -378,12 +308,12 @@ public class Village extends GenericModel {
         }
         // 選択された対象のリセット
         CommitUtils.resetTargets(alive);
-        if (!endCheck(members)) {
-            // 無事なら続行
-            state = State.Night;
-            nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);
-        }
+
+        if(endCheck(members))return save() != null;
+        // 無事なら続行
+        state = State.Night;
+        nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);
         return save() != null;
     }
 
@@ -395,9 +325,9 @@ public class Village extends GenericModel {
     private boolean commitToDay(List<Member> members) {
         if (state != State.Night) return false;
         // 生存メンバーの振り分け
-        List<Member> alives = MemberUtils.filterAlive(members);
-        Map<Skill, Set<Member>> work = MemberUtils.skillMembers(alives);
-        Map<Long, Member> names = MemberUtils.memberMap(alives); // id -> object
+        List<Member> alive = MemberUtils.filterAlive(members);
+        Map<Skill, Set<Member>> work = MemberUtils.skillMembers(alive);
+        Map<Long, Member> names = MemberUtils.memberMap(alive); // id -> object
         // 夜明け
         dayCount++;
         state = State.Day;
@@ -470,7 +400,7 @@ public class Village extends GenericModel {
         }
         // 選択された対象のリセット
         CommitUtils.resetTargets(members);
-        endCheck(alives);
+        endCheck(alive);
         return save() != null;
     }
 

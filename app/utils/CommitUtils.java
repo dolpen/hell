@@ -4,16 +4,64 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import consts.Constants;
 import models.Member;
-import models.Res;
-import models.enums.Permission;
+import models.enums.EpilogueType;
 import models.enums.Skill;
 import models.enums.Team;
 
 import java.util.*;
 
 public class CommitUtils {
+
+    /**
+     * 勝利判定
+     *
+     * @param members アクティブなメンバーリスト(一人死んでいる可能性がある)
+     * @return 決着ついたかどうか
+     */
+    public static EpilogueType getWinner(List<Member> members) {
+        int human = 0, wolf = 0;
+        boolean hamster = false;
+        Team trigger = null;
+        Set<Long> lovers = Sets.newHashSet();
+        Set<Long> survivors = Sets.newHashSet();
+        // カウントと特殊勝利条件の判定
+        for (Member m : members) {
+            if (m.skill.getInitialTeam() == Team.Lovers) {
+                lovers.add(m.targetMemberId2);
+                lovers.add(m.targetMemberId2);
+            }
+            if (!m.isAlive()) continue;
+            survivors.add(m.memberId);
+            switch (m.skill) {
+                case Hamster:
+                    hamster = true;
+                    break;
+                case Werewolf:
+                    wolf++;
+                    break;
+                default:
+                    human++;
+            }
+        }
+        if (wolf + human == 0) {
+            return EpilogueType.Draw;
+        } else if (wolf == 0) {
+            trigger = Team.Village;
+        } else if (human <= wolf) {
+            trigger = Team.Wolf;
+        } else {
+            return null;
+        }
+        // 生き残った恋人(!=陣営)のカウント
+        if (!Sets.intersection(lovers, survivors).isEmpty()) {
+            return EpilogueType.Lovers;
+        } else if (hamster) {
+            return trigger == Team.Village ? EpilogueType.HamsterV : EpilogueType.HamsterW;
+        }
+        return trigger == Team.Village ? EpilogueType.Village : EpilogueType.Wolf;
+    }
+
 
     /**
      * 恋人後追いグラフを作ります

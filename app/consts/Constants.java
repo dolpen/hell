@@ -1,6 +1,7 @@
 package consts;
 
 import com.google.common.collect.ImmutableMap;
+import models.enums.EpilogueType;
 import models.enums.Skill;
 
 import java.util.Map;
@@ -34,12 +35,6 @@ public class Constants {
     public static final String ATTACK_FAILED = "今日は犠牲者がいないようだ。人狼は襲撃を失敗したのだろうか。";
     public static final String HORRIBLE = " %s が無残な姿で発見されました。";
     // 決着
-    public static final String NO_WINNER = "そして誰もいなくなった。";
-    public static final String WIN_VILLAGER = "すべての人狼を退治しました。\n多くの犠牲の上に、ついに村に平和が訪れました。";
-    public static final String WIN_WOLF = "もう人狼に抵抗できるほど村人は残っていません。\n人狼は残った村人をすべて喰らい尽くし、新たな獲物を求めてこの村を去っていきました。";
-    public static final String WIN_HAMSTER_V = "すべての人狼を退治しました。\n多くの犠牲を重ね、ついに村に平和が訪れたかのように見えました。\nしかし、村にはまだ妖魔がひっそりと生き残っていました。";
-    public static final String WIN_HAMSTER_W = "もう人狼に抵抗できるほど村人は残っていません。\n生き残った村人もすべて人狼に襲われてしまいました。\nしかし、その人狼もまた村に潜んでいた妖魔によって滅ぼされました。";
-    public static final String WIN_LOVERS = "愛の前ではすべてのものが無力でした。";
 
     public static final Map<Skill, String> ACTION_SELECT = ImmutableMap.<Skill, String>builder()
             .put(Skill.Augur, "%s は %s を占います。")
@@ -54,6 +49,15 @@ public class Constants {
             .put(Skill.Hunter, "%s を護衛しています。")
             .put(Skill.Wooer, "%s は %s に求愛しました。")
             .put(Skill.Cupid, "%s は %s と %s に愛の矢を撃ちました。")
+            .build();
+
+    public static final Map<EpilogueType, String> WIN_MESSAGE = ImmutableMap.<EpilogueType, String>builder()
+            .put(EpilogueType.Draw, "そして誰もいなくなった。")
+            .put(EpilogueType.Village, "すべての人狼を退治しました。\n多くの犠牲の上に、ついに村に平和が訪れました。")
+            .put(EpilogueType.Wolf, "もう人狼に抵抗できるほど村人は残っていません。\n人狼は残った村人をすべて喰らい尽くし、新たな獲物を求めてこの村を去っていきました。")
+            .put(EpilogueType.HamsterV, "すべての人狼を退治しました。\n多くの犠牲を重ね、ついに村に平和が訪れたかのように見えました。\nしかし、村にはまだ妖魔がひっそりと生き残っていました。")
+            .put(EpilogueType.HamsterW, "もう人狼に抵抗できるほど村人は残っていません。\n生き残った村人もすべて人狼に襲われてしまいました。\nしかし、その人狼もまた村に潜んでいた妖魔によって滅ぼされました。")
+            .put(EpilogueType.Lovers, "愛の前ではすべてのものが無力でした。")
             .build();
 
     public static final String FORM_CATTLE = "村狼占狂\n"
