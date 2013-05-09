@@ -7,3 +7,5 @@ Disallow: /
 User-agent: AhrefsBot
 Disallow: /
 
+User-agent: Ezooms
+Disallow: /
