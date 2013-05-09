@@ -257,7 +257,6 @@ public class Village extends GenericModel {
      */
     public boolean tryCommit() {
         boolean force = nextCommit != null && nextCommit.before(new Date(System.currentTimeMillis()));
-        Logger.info("nextCommit : " + nextCommit.toString());
         Logger.info("force : " + force);
         if (state == State.Prologue) {
             if (!force) return false;
