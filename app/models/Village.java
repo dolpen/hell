@@ -1,17 +1,13 @@
 package models;
 
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 import consts.Constants;
 import models.enums.*;
 import org.joda.time.DateTime;
 import play.Logger;
 import play.db.jpa.GenericModel;
-import utils.CommitUtils;
-import utils.MemberUtils;
-import utils.SkillUtils;
-import utils.VillageUtils;
+import utils.*;
 
 import javax.persistence.*;
 import java.util.*;
@@ -196,16 +192,16 @@ public class Village extends GenericModel {
         // 聖痕者のナンバリング
         if (!MemberUtils.numberingStigmata(work.get(Skill.Stigmata))) return false;
 // 内訳発表
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, VillageUtils.getSkillFormMessage(work));
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, MessageUtils.getSkillFormMessage(work));
 // 役職決定
         for (Member m : members) {
             if (m.isDummy()) continue;
             Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.SKILL_SET, m.name, m.getLabel()));
         }
 // 仲間発表：狼(狂信者、C狂、狼に見える)
-        Res.createNewSystemMessage(this, Permission.Group, Skill.Fanatic, String.format(Constants.SKILL_WOLF, Joiner.on("、").join(VillageUtils.getNames(work.get(Skill.Werewolf)))));
+        Res.createNewSystemMessage(this, Permission.Group, Skill.Fanatic, String.format(Constants.SKILL_WOLF, Joiner.on("、").join(MessageUtils.getNames(work.get(Skill.Werewolf)))));
 // 仲間発表：共有者
-        List<String> freemasons = (VillageUtils.getNames(work.get(Skill.Freemason)));
+        List<String> freemasons = (MessageUtils.getNames(work.get(Skill.Freemason)));
         if (freemasons.size() == 1) {
             Res.createNewSystemMessage(this, Permission.Group, Skill.Freemason, String.format(Constants.SKILL_FREEMASON_SINGLE, freemasons.get(0)));
         } else if (!freemasons.isEmpty()) {
@@ -265,7 +261,7 @@ public class Village extends GenericModel {
      */
     private boolean endCheck(List<Member> members) {
         EpilogueType win = CommitUtils.getWinner(members);
-        if(win==null)return false;
+        if (win == null) return false;
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_MESSAGE.get(win));
         winner = win.getWinner();
         state = State.Epilogue;
@@ -294,28 +290,48 @@ public class Village extends GenericModel {
         Set<Long> memberIds = names.keySet();
         // 投票と処刑対象の決定
         Map<Long, Integer> votes = CommitUtils.vote(Sets.newHashSet(alive), memberIds, false); // id -> 票数
-        Long inmateId = CommitUtils.getElected(memberIds, votes);
+        Long inmateId = CommitUtils.decisiveVote(memberIds, votes);
         Member inmate = names.get(inmateId);
         // 処刑メッセージと処刑
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, VillageUtils.getVoteMessage(alive, names, inmate));
+        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, MessageUtils.getVoteMessage(alive, names, inmate));
         inmate.execute();
         // 霊メッセージ
         Res.createNewSystemMessage(this, Permission.Group, Skill.Mystic, String.format(Constants.EXECUTION_MYSTIC, inmate.name, inmate.skill.getAppearance()));
         // 恋人連鎖
-        for (Member[] lover : VillageUtils.killLovers(members, names, Sets.newHashSet(inmateId))) {
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, lover[0].name, lover[1].name));
-            lover[0].suicide();
+        for (Long[] lover : CommitUtils.killLovers(members, Sets.newHashSet(inmateId))) {
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, names.get(lover[0]).name, names.get(lover[1]).name));
+            names.get(lover[0]).suicide();
         }
-        // 選択された対象のリセット
+        // 選択された対象のリセットと、memberの更新
         CommitUtils.resetTargets(alive);
 
-        if(endCheck(members))return save() != null;
+        if (endCheck(members)) return save() != null;
         // 無事なら続行
         state = State.Night;
         nextCommit = DateTime.now().plusMinutes(nightTime).toDate();
         Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.TWILIGHT);
         return save() != null;
     }
+
+    private void initLovers(Map<Skill, Set<Member>> work, Map<Long, Member> names, Set<Long> memberIds, Random random) {
+        for (Member m : work.get(Skill.Cupid)) {
+            boolean isRandom = CommitUtils.processCupid(m, memberIds, names, random);
+            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Cupid), m.name, names.get(m.targetMemberId2).name, names.get(m.targetMemberId3).name) + (isRandom ? Constants.RANDOM : ""));
+        }
+        for (Member m : work.get(Skill.Wooer)) {
+            boolean isRandom = CommitUtils.processWooer(m, memberIds, names, random);
+            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, names.get(m.targetMemberId3).name) + (isRandom ? Constants.RANDOM : ""));
+        }
+        Map<Long, Set<Long>> lovers = CommitUtils.loversGraph(members);
+        for (Long id : lovers.keySet()) {
+            Member m = names.get(id);
+            for (Long l : lovers.get(id)) {
+                Res.createNewPersonalMessage(this, m, Permission.Personal, Skill.Cupid, String.format(Constants.FALL_IN_LOVE, m.name, names.get(l).name));
+            }
+        }
+
+    }
+
 
     /**
      * 能力発動と夜明け
@@ -328,39 +344,20 @@ public class Village extends GenericModel {
         List<Member> alive = MemberUtils.filterAlive(members);
         Map<Skill, Set<Member>> work = MemberUtils.skillMembers(alive);
         Map<Long, Member> names = MemberUtils.memberMap(alive); // id -> object
+        Set<Long> memberIds = names.keySet();
+        Random random = new Random(System.currentTimeMillis());
         // 夜明け
         dayCount++;
         state = State.Day;
         nextCommit = DateTime.now().plusMinutes(dayTime).toDate();
-
-        Random random = new Random(System.currentTimeMillis());
         // 恋関連処理
-
-        if (Skill.Cupid.hasAbility(dayCount - 1)) {
-            for (Member m : work.get(Skill.Cupid)) {
-                boolean isRandom = CommitUtils.processCupid(m, names, random);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Cupid), m.name, names.get(m.targetMemberId2).name, names.get(m.targetMemberId3).name) + (isRandom ? Constants.RANDOM : ""));
-            }
-            for (Member m : work.get(Skill.Wooer)) {
-                boolean isRandom = CommitUtils.processWooer(m, names, random);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, names.get(m.targetMemberId3).name) + (isRandom ? Constants.RANDOM : ""));
-            }
-            Map<Long, Set<Member>> lovers = CommitUtils.loversGraph(members);
-            for (Long id : lovers.keySet()) {
-                Member m = names.get(id);
-                for (Member l : lovers.get(id)) {
-                    Res.createNewPersonalMessage(this, m, Permission.Personal, Skill.Cupid, String.format(Constants.FALL_IN_LOVE, m.name, l.name));
-                }
-            }
-        }
-
-
+        if (Skill.Cupid.hasAbility(dayCount - 1)) initLovers(work, names, memberIds, random);
         Set<Long> horrible = Sets.newHashSet(); // (理由を問わず)無残各位
-
         // 占い結果
         for (Member m : work.get(Skill.Augur)) {
-            Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId, random)));
-            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_ACTION, target.name, target.skill.getAppearance()) + (m.isCommitable() ? "" : Constants.RANDOM));
+            boolean isRandom = CommitUtils.processTarget(m, memberIds, random);
+            Member target = names.get(m.targetMemberId);
+            Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.FORTUNE_ACTION, target.name, target.skill.getAppearance()) + (isRandom ? Constants.RANDOM : ""));
             if (target.skill == Skill.Hamster)
                 horrible.add(m.memberId); // 無残入り
         }
@@ -368,9 +365,10 @@ public class Village extends GenericModel {
         Set<Long> guardIds = Sets.newHashSet();
         if (Skill.Hunter.hasAbility(dayCount - 1)) { // 働くのは3日目夜明けより
             for (Member m : work.get(Skill.Hunter)) {
-                Member target = Objects.firstNonNull(names.get(m.targetMemberId), names.get(CommitUtils.randomMemberId(names.keySet(), m.memberId, random)));
+                boolean isRandom = CommitUtils.processTarget(m, memberIds, random);
+                Member target = names.get(m.targetMemberId);
                 guardIds.add(target.memberId);
-                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Hunter), target.name) + (m.isCommitable() ? "" : Constants.RANDOM));
+                Res.createNewPersonalMessage(this, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Hunter), target.name) + (isRandom ? Constants.RANDOM : ""));
             }
         }
 
@@ -394,15 +392,16 @@ public class Village extends GenericModel {
             Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.ATTACK_FAILED);
 
         // 恋人連鎖
-        for (Member[] lover : VillageUtils.killLovers(members, names, horrible)) {
-            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, lover[0].name, lover[1].name));
-            lover[0].suicide();
+        for (Long[] lover : CommitUtils.killLovers(members, horrible)) {
+            Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, names.get(lover[0]).name, names.get(lover[1]).name));
+            names.get(lover[0]).suicide();
         }
-        // 選択された対象のリセット
-        CommitUtils.resetTargets(members);
+        // 選択された対象のリセットと、memberの更新
+        CommitUtils.resetTargets(alive);
         endCheck(alive);
         return save() != null;
     }
+
 
     // ユーザーの行動
 
