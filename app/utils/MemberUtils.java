@@ -51,7 +51,7 @@ public class MemberUtils {
         List<Member> players = Lists.newArrayList();
         Member dummy = null;
         for (Member m : members) {
-            if (m.isDummy()) {
+            if (m.isDummy()||(dummyMemberId!=null && m.memberId.equals(dummyMemberId))) {
                 dummy = m;
             } else {
                 players.add(m);

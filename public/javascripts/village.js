@@ -1,10 +1,7 @@
 $(function () {
     var limit = $('#timeLimit').val();
     $('#start').submit(function() {
-        if (confirm("村を手動開始しますか？")) {
-            return true;
-        }
-        return false;
+        return confirm("村を手動開始しますか？");
     });
     if (limit == null || limit == "" || limit == "0"){
         $('#time').text('-');
