@@ -10,6 +10,20 @@ GET     /favicon.ico                            404
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
+POST    /login                                    Accounts.login
+GET     /logout                                   Accounts.logout
+GET     /signup                                   Accounts.index
+POST    /registration                             Accounts.registration
+GET     /v/{villageId}/0                          Games.detail
+GET     /v/{villageId}/detail                     Games.detail
+GET     /v/{villageId}/{day}                      Games.index
+GET     /v/{villageId}/                           Games.index
+
+GET     /o/settle                                 Options.settle
+POST    /o/settle                                 Options.settleVillage
+GET     /o/{villageId}                            Options.update
+POST    /o/update                                 Options.updateVillage
+GET     /o/start                                  Options.startVillage
 
 # Catch all
 *       /{controller}/{action}                  {controller}.{action}
