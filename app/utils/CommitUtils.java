@@ -7,6 +7,7 @@ import consts.Constants;
 import models.Member;
 import models.Res;
 import models.Village;
+import models.enums.EpilogueType;
 import models.enums.Permission;
 import models.enums.Skill;
 import models.enums.State;
@@ -99,7 +100,12 @@ public class CommitUtils {
             resList.add(Res.buildSystemMessage(village, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, names.get(lover[0]).name, names.get(lover[1]).name)));
             names.get(lover[0]).suicide();
         }
-        if (village.endCheck()) return resList;
+
+        Res fin = checkWinner(village, members);
+        if (fin != null) {
+            resList.add(fin);
+            return resList;
+        }
         // 無事なら続行
         village.state = State.Night;
         village.nextCommit = DateTime.now().plusMinutes(village.nightTime).toDate();
@@ -177,10 +183,25 @@ public class CommitUtils {
             resList.add(Res.buildSystemMessage(village, Permission.Public, Skill.Dummy, String.format(Constants.SUICIDE, names.get(lover[0]).name, names.get(lover[1]).name)));
             names.get(lover[0]).suicide();
         }
-        village.endCheck();
+        Res fin = checkWinner(village, members);
+        if (fin != null) resList.add(fin);
         return resList;
+    }
 
-
+    /**
+     * 勝敗チェック
+     *
+     * @param village 村(状態変わるが未セーブ)
+     * @param members 死亡者含むメンバー一覧(状態変わるが未セーブ)
+     * @return 追加すべきログ一覧(未セーブ)
+     */
+    public static Res checkWinner(Village village, List<Member> members) {
+        EpilogueType win = SkillUtils.getWinner(members);
+        if (win == null) return null;
+        village.winner = win.getWinner();
+        village.state = State.Epilogue;
+        village.nextCommit = DateTime.now().plusDays(1).toDate();
+        return Res.buildSystemMessage(village, Permission.Public, Skill.Dummy, Constants.WIN_MESSAGE.get(win));
     }
 
     private static List<Res> initLovers(Village village, List<Member> members, Map<Skill, Set<Member>> work, Map<Long, Member> names, Set<Long> memberIds, Random random) {
@@ -191,7 +212,7 @@ public class CommitUtils {
         }
         for (Member m : work.get(Skill.Wooer)) {
             boolean isRandom = SkillUtils.processWooer(m, memberIds, names, random);
-            resList.add(Res.buildPersonalMessage(village, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, names.get(m.targetMemberId3).name) + (isRandom ? Constants.RANDOM : "")));
+            resList.add(Res.buildPersonalMessage(village, m, Permission.Personal, m.skill, String.format(Constants.ACTION_MESSAGE.get(Skill.Wooer), m.name, names.get(m.targetMemberId2).name) + (isRandom ? Constants.RANDOM : "")));
         }
         Map<Long, Set<Long>> lovers = SkillUtils.loversGraph(members);
         for (Long id : lovers.keySet()) {

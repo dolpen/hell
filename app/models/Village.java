@@ -1,17 +1,19 @@
 package models;
 
 import consts.Constants;
-import models.enums.*;
-import org.joda.time.DateTime;
-import play.Logger;
+import models.enums.Permission;
+import models.enums.Skill;
+import models.enums.State;
+import models.enums.Team;
 import play.db.jpa.GenericModel;
 import utils.CommitUtils;
 import utils.MemberUtils;
-import utils.SkillUtils;
 import utils.VillageUtils;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 
 @Entity(name = "village")
 public class Village extends GenericModel {
@@ -53,6 +55,8 @@ public class Village extends GenericModel {
     //public static List<Village> findByState(State state) {
     //    return find("state = ?1", state).fetch();
     //}
+
+    // 村の管理
 
     /**
      * 村建て&例のシステムメッセージ
@@ -185,33 +189,26 @@ public class Village extends GenericModel {
      * @return 成功すれば<code>true</code>
      */
     public boolean tryCommit() {
-        Logger.info("MEMBERS IS " + (members == null ? 0 : members.size()));
         boolean force = nextCommit != null && nextCommit.before(new Date(System.currentTimeMillis()));
-        Logger.info("force : " + force);
-        if (state == State.Prologue) {
-            if (!force) return false;
-            boolean success = start();
-            if (!success) {
-                nextCommit = null;
-                save();
-            }
-            return success;
-        }
-        List<Member> members = Member.findByVillage(this);
-        if (!force) {
-            for (Member m : members) {
+        // 自動系のチェック
+        if (force) {
+            if (state == State.Prologue)
+                return start(); // 自動開始の実行
+            if (state == State.Epilogue)
+                return close(); // 自動終了,閉村
+        } else {
+            // 全員がコミット可能ならコミットする
+            for (Member m : members)
                 if (m.isAlive() && !m.isCommitable() && (m.hasAbility(dayCount) || state == State.Day)) return false;
-            }
         }
         boolean success = false;
-        if (state == State.Day) {
-            success = commitToNight(members);
-            if (!success) Logger.error("commitToDay failed!!!!!!!!!!!!!!!!!!!!!!!!");
-        } else if (state == State.Night) {
-            success = commitToDay(members);
-            if (!success) Logger.error("commitToNight failed!!!!!!!!!!!!!!!!!!!!!!!!");
-        } else if (force && state == State.Epilogue) {
-            success = toClose();
+        switch (state) {
+            case Day:
+                success = evening(members);
+                break;
+            case Night:
+                success = daybreak(members);
+                break;
         }
         return success;
     }
@@ -223,7 +220,12 @@ public class Village extends GenericModel {
      */
     public boolean start() {
         List<Res> resList = CommitUtils.start(this, members);
-        if (resList == null || !validateAndSave()) return false;
+        if (resList == null) {
+            nextCommit = null;
+            save();
+            return false;
+        }
+        if (!validateAndSave()) return false;
         for (Res r : resList)
             r.create();
         MemberUtils.resetTargets(members);
@@ -235,7 +237,7 @@ public class Village extends GenericModel {
      *
      * @return 成功すれば<code>true</code>
      */
-    private boolean commitToNight(List<Member> members) {
+    private boolean evening(List<Member> members) {
         List<Res> resList = CommitUtils.evening(this, members);
         if (resList == null || !validateAndSave()) return false;
         for (Res r : resList)
@@ -249,7 +251,7 @@ public class Village extends GenericModel {
      *
      * @return 成功すれば<code>true</code>
      */
-    private boolean commitToDay(List<Member> members) {
+    private boolean daybreak(List<Member> members) {
         List<Res> resList = CommitUtils.daybreak(this, members);
         if (resList == null || !validateAndSave()) return false;
         for (Res r : resList)
@@ -258,28 +260,16 @@ public class Village extends GenericModel {
         return true;
     }
 
-    private boolean toClose() {
+    /**
+     * 決着→終了
+     *
+     * @return 成功すれば<code>true</code>
+     */
+    private boolean close() {
         state = State.Closed;
         nextCommit = null;
         return save() != null;
     }
-
-    /**
-     * 勝利判定
-     *
-     * @return 決着ついたかどうか
-     */
-    public boolean endCheck() {
-        EpilogueType win = SkillUtils.getWinner(members);
-        if (win == null) return false;
-        Res.createNewSystemMessage(this, Permission.Public, Skill.Dummy, Constants.WIN_MESSAGE.get(win));
-        winner = win.getWinner();
-        state = State.Epilogue;
-        nextCommit = DateTime.now().plusDays(1).toDate();
-        return true;
-    }
-
-
 
     // ユーザーの行動
 

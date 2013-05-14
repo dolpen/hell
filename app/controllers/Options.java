@@ -87,7 +87,7 @@ public class Options extends Controller {
     }
 
     /**
-     * 村の開始
+     * 村の手動開始
      *
      * @param villageId 村ID
      */
@@ -96,8 +96,7 @@ public class Options extends Controller {
         if (validation.hasErrors()) Application.index();
         Village village = Village.findByIdAndAdmin(villageId, getUserId());
         if (village == null) Application.index();
-        if (village.state == State.Prologue)
-            village.start();
+        village.start();
         Games.index(village.villageId, null, null);
     }
 
