@@ -51,7 +51,7 @@ public class Options extends Controller {
      *
      * @param villageId 村ID
      */
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public static void update(@Required Long villageId) {
         if (validation.hasErrors())
             Application.index();
@@ -77,7 +77,7 @@ public class Options extends Controller {
     @Transactional
     public static void updateVillage(@Required Long villageId, @Required String name, @Required String form, @Required Integer dayTime, @Required Integer nightTime, @Required Boolean dummy, @As(Constants.DATETIME_PICKER) Date time) {
         if (validation.hasErrors() && !(validation.errorsMap().keySet().size() == 1 && validation.errorsMap().keySet().contains("time"))) {
-            if(villageId!=null)update(villageId);
+            if (villageId != null) update(villageId);
             Application.index();
         }
         Village village = Village.findByIdAndAdmin(villageId, getUserId());

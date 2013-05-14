@@ -29,7 +29,7 @@ public class Application extends Controller {
     /**
      * トップページ
      */
-    @Transactional(readOnly=true)
+    @Transactional(readOnly = true)
     public static void index() {
         List<Village> villages = Village.all().fetch();
         render(villages);

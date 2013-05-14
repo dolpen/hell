@@ -39,7 +39,7 @@ public class Etc extends Controller {
 
     @Transactional
     public static void reset() {
-        if(Village.count()>0)notFound();
+        if (Village.count() > 0) notFound();
         Village.deleteAll();
         Member.deleteAll();
         Res.deleteAll();

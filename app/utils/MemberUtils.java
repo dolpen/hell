@@ -51,7 +51,7 @@ public class MemberUtils {
         List<Member> players = Lists.newArrayList();
         Member dummy = null;
         for (Member m : members) {
-            if (m.isDummy()||(dummyMemberId!=null && m.memberId.equals(dummyMemberId))) {
+            if (m.isDummy() || (dummyMemberId != null && m.memberId.equals(dummyMemberId))) {
                 dummy = m;
             } else {
                 players.add(m);
@@ -128,5 +128,16 @@ public class MemberUtils {
             }
         }
         return ret;
+    }
+
+    /**
+     * 能力選択や投票の状態をリセットする
+     *
+     * @param members メンバー
+     */
+    public static void resetTargets(List<Member> members) {
+        for (Member m : members) {
+            m.resetTarget();
+        }
     }
 }

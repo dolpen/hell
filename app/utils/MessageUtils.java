@@ -37,7 +37,7 @@ public class MessageUtils {
         List<String> voteMessages = Lists.newArrayList();
         Set<Long> memberIds = names.keySet();
         for (Member m : alive) {
-            Long id = m.isCommitable() ? m.targetMemberId : CommitUtils.randomMemberId(memberIds, m.memberId, null);
+            Long id = m.isCommitable() ? m.targetMemberId : SkillUtils.randomMemberId(memberIds, m.memberId, null);
             voteMessages.add(String.format(Constants.VOTE_ACTION, m.name, names.get(id).name) + (m.isCommitable() ? "" : Constants.RANDOM));
             m.targetMemberId = id;
         }

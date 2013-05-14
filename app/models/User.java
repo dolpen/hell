@@ -2,10 +2,10 @@ package models;
 
 import com.google.common.base.Strings;
 import play.db.jpa.GenericModel;
-import play.db.jpa.JPA;
 
-import javax.persistence.*;
-import java.util.List;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 @Entity(name = "user")
 public class User extends GenericModel {

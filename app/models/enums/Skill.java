@@ -66,10 +66,10 @@ public enum Skill {
             case Augur:
                 return true;
             case Hunter:
-                return dayCount>1;
+                return dayCount > 1;
             case Cupid:
             case Wooer:
-                return dayCount==1;
+                return dayCount == 1;
         }
         return false;
     }

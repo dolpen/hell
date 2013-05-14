@@ -8,7 +8,9 @@ import models.enums.Skill;
 import models.enums.State;
 import play.db.jpa.Model;
 
-import javax.persistence.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
