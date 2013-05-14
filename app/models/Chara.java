@@ -8,6 +8,9 @@ import javax.persistence.ManyToOne;
 import java.util.List;
 
 @Entity(name = "chara")
+@org.hibernate.annotations.Table(appliesTo = "chara", indexes = {
+        @org.hibernate.annotations.Index(name = "idx_chara_select", columnNames = {"party_partyId", "characterId"})
+})
 public class Chara extends Model {
 
     public Long characterId;

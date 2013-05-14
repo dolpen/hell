@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Set;
 
 @Entity(name = "member")
+@org.hibernate.annotations.Table(appliesTo = "member", indexes = {
+        @org.hibernate.annotations.Index(name = "idx_vil_members", columnNames = {"village_villageId"})
+})
 public class Member extends GenericModel {
 
     @Id

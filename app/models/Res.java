@@ -16,6 +16,9 @@ import java.util.EnumSet;
 import java.util.List;
 
 @Entity(name = "res")
+@org.hibernate.annotations.Table(appliesTo = "res", indexes = {
+        @org.hibernate.annotations.Index(name = "idx_vil_view", columnNames = {"villageId", "dayCount"})
+})
 public class Res extends Model {
     public Long memberId;
     public Long villageId;
@@ -218,9 +221,11 @@ public class Res extends Model {
         r.logType = LogType.System;
         return r;
     }
+
     public static Res buildSystemMessage(Village village, Permission permission, Skill skill, String body) {
         return buildNewSystemMessage(village, null, permission, skill, body);
     }
+
     public static Res buildPersonalMessage(Village village, Member member, Permission permission, Skill skill, String body) {
         return buildNewSystemMessage(village, member, permission, Objects.firstNonNull(skill, member.skill), body);
     }
