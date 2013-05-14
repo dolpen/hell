@@ -3,6 +3,7 @@ package controllers;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Maps;
+import consts.Constants;
 import consts.CookieName;
 import models.*;
 import models.enums.State;
@@ -86,8 +87,8 @@ public class Games extends Controller {
         boolean finished = village.isFinished();
         boolean now = village.dayCount == day && village.state != State.Closed;
         // ログ
-        List<Res> logs = ResUtils.getRes(village, me, day, alive, finished, all ? 0 : 50);
-        boolean skipped = !all && logs.size() > 50;
+        List<Res> logs = ResUtils.getRes(village, me, day, alive, finished, all ? 0 : Constants.LOG_LIMIT);
+        boolean skipped = !all && logs.size() > Constants.LOG_LIMIT;
         if (skipped) logs.remove(0);
         // ここまでログ
         List<Chara> charas = CharacterUtils.getCharacters(village, me);

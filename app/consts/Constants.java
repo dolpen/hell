@@ -34,8 +34,8 @@ public class Constants {
     public static final String FORTUNE_ACTION = " %s は %s のようです。";
     public static final String ATTACK_FAILED = "今日は犠牲者がいないようだ。人狼は襲撃を失敗したのだろうか。";
     public static final String HORRIBLE = " %s が無残な姿で発見されました。";
-    // 決着
 
+    // アクション・設定
     public static final Map<Skill, String> ACTION_SELECT = ImmutableMap.<Skill, String>builder()
             .put(Skill.Augur, "%s は %s を占います。")
             .put(Skill.Werewolf, "%s は %s を襲撃します。")
@@ -44,13 +44,14 @@ public class Constants {
             .put(Skill.Cupid, "%s は %s と %s に愛の矢を撃ちます。")
             .build();
 
+    // アクション・実行
     public static final Map<Skill, String> ACTION_MESSAGE = ImmutableMap.<Skill, String>builder()
             .put(Skill.Werewolf, "%s を襲撃します。")
             .put(Skill.Hunter, "%s を護衛しています。")
             .put(Skill.Wooer, "%s は %s に求愛しました。")
             .put(Skill.Cupid, "%s は %s と %s に愛の矢を撃ちました。")
             .build();
-
+    // 決着
     public static final Map<EpilogueType, String> WIN_MESSAGE = ImmutableMap.<EpilogueType, String>builder()
             .put(EpilogueType.Draw, "そして誰もいなくなった。")
             .put(EpilogueType.Village, "すべての人狼を退治しました。\n多くの犠牲の上に、ついに村に平和が訪れました。")
@@ -60,6 +61,10 @@ public class Constants {
             .put(EpilogueType.Lovers, "愛の前ではすべてのものが無力でした。")
             .build();
 
+    // ログ件数
+    public static final int LOG_LIMIT = 30;
+
+    //構成例：牛村
     public static final String FORM_CATTLE = "村狼占狂\n"
             + "村村狼占狂\n"
             + "村村村狼占狂\n"
