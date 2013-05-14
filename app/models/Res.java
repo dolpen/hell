@@ -118,7 +118,6 @@ public class Res extends Model {
         return res;
     }
 
-
     /**
      * 村発言ログの追加
      *
@@ -128,7 +127,7 @@ public class Res extends Model {
      * @param body       本文
      * @return 追加できれば<code>true</code>
      */
-    private static boolean createNewRes(Village village, Member member, Permission permission, String body) {
+    private static Res buildNewRes(Village village, Member member, Permission permission, String body) {
         Res r = new Res();
         r.memberId = member.memberId;
         r.villageId = village.villageId;
@@ -140,9 +139,8 @@ public class Res extends Model {
         r.skill = member.skill;
         r.body = body;
         r.logType = LogType.Say;
-        return r.save() != null;
+        return r;
     }
-
 
     /**
      * 発言
@@ -154,7 +152,7 @@ public class Res extends Model {
      */
     public static boolean say(Village village, Member member, String body) {
         if (!member.isAlive() && !village.isFinished()) return false; // 村終了前and死亡者は霊界発言不可
-        return createNewRes(village, member, Permission.Public, body);
+        return buildNewRes(village, member, Permission.Public, body).create();
     }
 
     /**
@@ -166,7 +164,7 @@ public class Res extends Model {
      * @return 追加できれば<code>true</code>
      */
     public static boolean wisper(Village village, Member member, String body) {
-        return createNewRes(village, member, Permission.Personal, body);
+        return buildNewRes(village, member, Permission.Personal, body).create();
     }
 
     /**
@@ -179,7 +177,7 @@ public class Res extends Model {
      */
     public static boolean closet(Village village, Member member, String body) {
         if (village.state != State.Night || !member.isAlive() || !member.skill.hasCloset()) return false;
-        return createNewRes(village, member, Permission.Group, body);
+        return buildNewRes(village, member, Permission.Group, body).create();
     }
 
     /**
@@ -192,7 +190,39 @@ public class Res extends Model {
      */
     public static boolean spirit(Village village, Member member, String body) {
         if (member.isAlive() || village.isFinished()) return false; // 村終了時or生存者は霊界発言不可
-        return createNewRes(village, member, Permission.Spirit, body);
+        return buildNewRes(village, member, Permission.Spirit, body).create();
+    }
+
+
+    /**
+     * システムメッセージの追加
+     *
+     * @param village    村
+     * @param member     発言、閲覧対象の参加者
+     * @param permission 公開範囲
+     * @param skill      公開対象役職、無ければダミー(全員が閲覧可能)
+     * @param body       本文
+     * @return 追加できれば<code>true</code>
+     */
+    public static Res buildNewSystemMessage(Village village, Member member, Permission permission, Skill skill, String body) {
+        Res r = new Res();
+        r.memberId = member == null ? 0L : member.memberId;
+        r.villageId = village.villageId;
+        r.chara = null;
+        r.name = Constants.SYSTEM_NAME;
+        r.dayCount = village.dayCount;
+        r.postDate = new Date();
+        r.permission = permission;
+        r.skill = Objects.firstNonNull(skill, Skill.Dummy);
+        r.body = body;
+        r.logType = LogType.System;
+        return r;
+    }
+    public static Res buildSystemMessage(Village village, Permission permission, Skill skill, String body) {
+        return buildNewSystemMessage(village, null, permission, skill, body);
+    }
+    public static Res buildPersonalMessage(Village village, Member member, Permission permission, Skill skill, String body) {
+        return buildNewSystemMessage(village, member, permission, Objects.firstNonNull(skill, member.skill), body);
     }
 
     /**
@@ -205,18 +235,7 @@ public class Res extends Model {
      * @return 追加できれば<code>true</code>
      */
     public static boolean createNewSystemMessage(Village village, Permission permission, Skill skill, String body) {
-        Res r = new Res();
-        r.memberId = 0L;
-        r.villageId = village.villageId;
-        r.chara = null;
-        r.name = Constants.SYSTEM_NAME;
-        r.dayCount = village.dayCount;
-        r.postDate = new Date();
-        r.permission = permission;
-        r.skill = skill == null ? Skill.Dummy : skill;
-        r.body = body;
-        r.logType = LogType.System;
-        return r.save() != null;
+        return buildSystemMessage(village, permission, skill, body).create();
     }
 
     /**
@@ -230,17 +249,8 @@ public class Res extends Model {
      * @return 追加できれば<code>true</code>
      */
     public static boolean createNewPersonalMessage(Village village, Member member, Permission permission, Skill skill, String body) {
-        Res r = new Res();
-        r.memberId = member.memberId;
-        r.villageId = village.villageId;
-        r.chara = null;
-        r.name = Constants.SYSTEM_NAME;
-        r.dayCount = village.dayCount;
-        r.postDate = new Date();
-        r.permission = permission;
-        r.skill = Objects.firstNonNull(skill, member.skill);
-        r.body = body;
-        r.logType = LogType.System;
-        return r.save() != null;
+        return buildPersonalMessage(village, member, permission, skill, body).create();
     }
+
+
 }

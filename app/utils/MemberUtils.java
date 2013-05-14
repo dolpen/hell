@@ -63,7 +63,6 @@ public class MemberUtils {
             if (forDummy != Skill.Villager) return false;
             dummy.skill = forDummy;
             dummy.team = forDummy.getInitialTeam();
-            dummy.save();
         }
         // 役職の割り振り
         int l = players.size();
@@ -72,7 +71,6 @@ public class MemberUtils {
             Member m = players.get(i);
             m.skill = skills.get(ind[i] + (dummy == null ? 0 : 1));
             m.team = m.skill.getInitialTeam();
-            m.save();
         }
         return true;
     }
