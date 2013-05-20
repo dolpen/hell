@@ -4,7 +4,7 @@
     padding: 9px 0;
     position: fixed;
     top: 36px;
-    width : 280px;
+    width: 280px;
 }
 
 .row-fluid > .span-fixed-sidebar {
@@ -16,7 +16,6 @@
     margin-bottom: 50px;
     overflow: auto;
 }
-
 
 .character {
     font-size: small;
@@ -36,8 +35,14 @@
 .log_say {
     border-left: 10px solid #dddddd;
 }
-.log_say first-child {
-    width: 80px;
+
+.log_say td div {
+    max-width: 454px;
+    word-wrap: break-word;
+}
+
+.log_say td:first-child {
+    min-width: 55px;
 }
 
 .log_wisper {
